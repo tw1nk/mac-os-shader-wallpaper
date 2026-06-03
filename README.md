@@ -114,35 +114,9 @@ ShaderWallpaper/
 
 ## 🎯 Adding Custom Shaders
 
-Want to add your own shaders? Here's how:
+Custom shaders are planned to be added as Shader Packages instead of hardcoded Swift enum cases. A Shader Package contains a `shader.yaml` manifest plus either a Metal source file or compiled `.metallib`, and installable archives use the `.wallshader` extension.
 
-1. **Add shader type** in `ShaderRenderer.swift`:
-```swift
-enum ShaderType: String, CaseIterable {
-    case myShader = "My Custom Shader"
-    // Add case to shaderName switch...
-}
-```
-
-2. **Create shader file** in `Shaders/myShader.metal`:
-```metal
-#include <metal_stdlib>
-#include "common.metal"
-#include "vertex.metal"
-
-fragment float4 myShader(VertexOut in [[stage_in]],
-                         constant Uniforms &uniforms [[buffer(0)]]) {
-    float2 uv = in.texCoord;
-    // Your shader code here
-    return float4(color, 1.0);
-}
-```
-
-3. **Update ShaderRenderer.swift** to include your shader:
-   - Add `case myShader: return "myShader"` in the `shaderName` switch
-   - Add `.myShader` to the CaseIterable enum if needed
-
-4. Rebuild and enjoy your custom effect!
+See [docs/shader-packages.md](docs/shader-packages.md) for the package format, manifest fields, Shader Interface, resources, texture assets, and diagnostics behavior.
 
 ## 🐛 Troubleshooting
 

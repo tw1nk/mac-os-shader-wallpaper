@@ -1,0 +1,3 @@
+# Use shader packages as the loading model
+
+Shader effects are loaded from shader packages rather than hardcoded menu entries. Built-in and installed effects use the same one-package-one-effect model: folder packages are canonical, `.wallshader` archives are install/import artifacts, manifests provide stable identity, versions, resources, shader artifact, and package-local assets, and duplicate IDs are handled deterministically with diagnostics rather than override behavior. Built-in packages should ship in release-style form using compiled Metal libraries rather than relying on hardcoded Swift registrations.
