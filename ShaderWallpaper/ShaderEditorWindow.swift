@@ -12,6 +12,7 @@ final class ShaderEditorState: ObservableObject {
     @Published var isDirty = false
     @Published var packageExists = true
 
+    private let originalID: String
     private var manifestURL: URL?
     private var sourceURL: URL?
     private var savedManifestText = ""
@@ -21,6 +22,7 @@ final class ShaderEditorState: ObservableObject {
         packageURL = effect.packageURL
         activeRenderer = renderer
         effectName = effect.name
+        originalID = effect.id
         loadFromDisk()
         reloadPreview()
     }
@@ -107,7 +109,49 @@ final class ShaderEditorState: ObservableObject {
         )
         previewEffect = effect
         effectName = manifest.name
+        if manifest.id != originalID {
+            diagnostics.append("Package id changed; use Set Active again to activate the new Shader Effect identity.")
+        }
+        if manifest.editable != true {
+            diagnostics.append("This package no longer allows editing. Close this Shader Editor Window.")
+            packageExists = false
+        }
+        if case let .source(path) = manifest.artifact {
+            let newSourceURL = packageURL.appendingPathComponent(path)
+            if sourceURL?.standardizedFileURL != newSourceURL.standardizedFileURL, FileManager.default.fileExists(atPath: newSourceURL.path) {
+                sourceURL = newSourceURL
+                sourceText = (try? String(contentsOf: newSourceURL, encoding: .utf8)) ?? sourceText
+                savedSourceText = sourceText
+            } else if !FileManager.default.fileExists(atPath: newSourceURL.path), path.hasSuffix(".metal") {
+                diagnostics.append("Source file is missing. Use Create Source File to add it.")
+            }
+        }
         if diagnostics.isEmpty { diagnostics.append("Saved and preview reloaded.") }
+    }
+
+    func createMissingSourceFile() {
+        guard let manifest = try? ShaderManifest.decodeYAML(manifestText), case let .source(path) = manifest.artifact, path.hasSuffix(".metal") else { return }
+        let url = packageURL.appendingPathComponent(path)
+        guard !FileManager.default.fileExists(atPath: url.path) else { return }
+        do {
+            try FileManager.default.createDirectory(at: url.deletingLastPathComponent(), withIntermediateDirectories: true)
+            let source = """
+            #include <metal_stdlib>
+            #include "ShaderWallpaper.h"
+            using namespace metal;
+
+            fragment float4 \(manifest.fragmentFunction)(ShaderWallpaperVertexOut in [[stage_in]], constant ShaderWallpaperUniforms& u [[buffer(0)]]) {
+                return float4(in.uv, 0.5 + 0.5 * sin(u.time), 1.0);
+            }
+            """
+            try source.write(to: url, atomically: true, encoding: .utf8)
+            sourceURL = url
+            sourceText = source
+            savedSourceText = source
+            reloadPreview()
+        } catch {
+            diagnostics.append("Create Source File failed: \(error.localizedDescription)")
+        }
     }
 
     private func updateDirtyState() {
@@ -143,6 +187,7 @@ struct ShaderEditorWindowView: View {
                         .textSelection(.enabled)
                 }
                 Spacer()
+                Button("Create Source File") { state.createMissingSourceFile() }
                 Button("Save") { state.save() }
                     .keyboardShortcut("s", modifiers: .command)
                     .disabled(!state.isDirty || !state.packageExists)

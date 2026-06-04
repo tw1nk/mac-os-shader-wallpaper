@@ -19,7 +19,7 @@ Previous shader package issues `SCRATCH-0001` through `SCRATCH-0014` were comple
 - [SCRATCH-0029: Introduce shared Shader Effect loading core](issues/0029-introduce-shared-shader-effect-loading-core.md) — closed
 - [SCRATCH-0030: Implement editor preview with save-triggered Shader Hot Reload](issues/0030-implement-editor-preview-with-save-triggered-shader-hot-reload.md) — closed
 - [SCRATCH-0031: Safely hot reload active wallpaper after editor preview succeeds](issues/0031-safely-hot-reload-active-wallpaper-after-editor-preview-succeeds.md) — closed
-- [SCRATCH-0032: Handle manifest identity and source-path changes in the editor](issues/0032-handle-manifest-identity-and-source-path-changes-in-the-editor.md) — open
+- [SCRATCH-0032: Handle manifest identity and source-path changes in the editor](issues/0032-handle-manifest-identity-and-source-path-changes-in-the-editor.md) — closed
 - [SCRATCH-0033: Add Set Active from Shader Editor Window](issues/0033-add-set-active-from-shader-editor-window.md) — open
 - [SCRATCH-0034: Watch open package folder for external changes](issues/0034-watch-open-package-folder-for-external-changes.md) — open
 - [SCRATCH-0035: Improve compiler diagnostics for editor navigation](issues/0035-improve-compiler-diagnostics-for-editor-navigation.md) — open
