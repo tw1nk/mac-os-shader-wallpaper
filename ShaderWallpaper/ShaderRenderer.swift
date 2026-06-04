@@ -320,7 +320,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
         }
     }
     
-    func loadShader(_ shader: ShaderEffectDescriptor, for metalView: MTKView, isInitialLoad: Bool = false) {
+    func loadShader(_ shader: ShaderEffectDescriptor, for metalView: MTKView, isInitialLoad: Bool = false, persistSelection: Bool = true) {
         guard
             let appLibrary = try? device.makeDefaultLibrary(bundle: Bundle.main),
             let vertexFunction = appLibrary.makeFunction(name: "vertexShader")
@@ -378,7 +378,9 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
             prepareResources(for: shader)
             activeDesktopTextureIndex = bindings.desktopTextureIndex
             activePackageTextures = bindings.packageTextures
-            UserDefaults.standard.set(shader.id, forKey: ShaderEffectDescriptor.storageKey)
+            if persistSelection {
+                UserDefaults.standard.set(shader.id, forKey: ShaderEffectDescriptor.storageKey)
+            }
             print("Loaded shader: \(shader.name)")
         } catch {
             recordLoadFailure(for: shader, message: "Failed to create pipeline for shader package '\(shader.name)': \(error.localizedDescription)")

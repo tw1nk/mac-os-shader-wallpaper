@@ -79,7 +79,7 @@ struct ShaderLibraryWindowView: View {
             .padding()
             .frame(minWidth: 360)
 
-            ShaderLibraryDetailPlaceholder(state: state)
+            ShaderLibraryDetailPane(state: state)
                 .padding()
                 .frame(minWidth: 320)
         }
@@ -273,7 +273,7 @@ private struct Badge: View {
     }
 }
 
-private struct ShaderLibraryDetailPlaceholder: View {
+private struct ShaderLibraryDetailPane: View {
     @ObservedObject var state: ShaderLibraryState
 
     var body: some View {
@@ -282,27 +282,44 @@ private struct ShaderLibraryDetailPlaceholder: View {
                 .font(.title3)
                 .bold()
 
-            ZStack {
-                RoundedRectangle(cornerRadius: 12)
-                    .fill(Color.black.opacity(0.85))
-                VStack(spacing: 8) {
-                    Image(systemName: "play.rectangle")
-                        .font(.largeTitle)
-                    Text("Live preview placeholder")
-                        .foregroundStyle(.secondary)
+            ShaderLivePreviewView(effect: selectedEffect)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+                .overlay {
+                    RoundedRectangle(cornerRadius: 12)
+                        .stroke(Color.secondary.opacity(0.2), lineWidth: 1)
                 }
-            }
-            .aspectRatio(16.0 / 9.0, contentMode: .fit)
+                .aspectRatio(currentDisplayAspectRatio, contentMode: .fit)
 
             Divider()
 
-            Text("Details placeholder")
-                .font(.headline)
-            Text("Selected effect metadata and Set Active controls are added in later slices.")
-                .foregroundStyle(.secondary)
+            if let selectedEffect {
+                Text(selectedEffect.name)
+                    .font(.headline)
+                Text(selectedEffect.manifest.description ?? "No description provided.")
+                    .foregroundStyle(.secondary)
+                Text(selectedEffect.id)
+                    .font(.caption)
+                    .foregroundStyle(.secondary)
+                    .textSelection(.enabled)
+            } else {
+                Text("Select a Shader Effect")
+                    .font(.headline)
+                Text("Choose a card to preview its live shader output.")
+                    .foregroundStyle(.secondary)
+            }
 
             Spacer()
         }
+    }
+
+    private var selectedEffect: ShaderEffectDescriptor? {
+        guard let selectedShaderID = state.selectedShaderID else { return nil }
+        return state.renderer.packageRegistry.effects.first { $0.id == selectedShaderID }
+    }
+
+    private var currentDisplayAspectRatio: CGFloat {
+        guard let screen = NSScreen.main, screen.frame.height > 0 else { return 16.0 / 9.0 }
+        return screen.frame.width / screen.frame.height
     }
 }
 
