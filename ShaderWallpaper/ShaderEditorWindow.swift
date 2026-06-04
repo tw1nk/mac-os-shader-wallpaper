@@ -129,6 +129,14 @@ final class ShaderEditorState: ObservableObject {
         if diagnostics.isEmpty { diagnostics.append("Saved and preview reloaded.") }
     }
 
+    func setActive() {
+        guard let previewEffect else { return }
+        if isDirty {
+            diagnostics.append("Save before Set Active, or the last saved version will be activated.")
+        }
+        activeRenderer?.activateShader(previewEffect)
+    }
+
     func createMissingSourceFile() {
         guard let manifest = try? ShaderManifest.decodeYAML(manifestText), case let .source(path) = manifest.artifact, path.hasSuffix(".metal") else { return }
         let url = packageURL.appendingPathComponent(path)
@@ -188,6 +196,8 @@ struct ShaderEditorWindowView: View {
                 }
                 Spacer()
                 Button("Create Source File") { state.createMissingSourceFile() }
+                Button("Set Active") { state.setActive() }
+                    .disabled(state.previewEffect == nil)
                 Button("Save") { state.save() }
                     .keyboardShortcut("s", modifiers: .command)
                     .disabled(!state.isDirty || !state.packageExists)
