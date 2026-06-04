@@ -50,9 +50,79 @@ final class ShaderLibraryState: ObservableObject {
         renderer.currentShader?.id
     }
 
+    var hasDiagnostics: Bool {
+        renderer.packageDiagnostics.contains { $0.severity == .warning || $0.severity == .error }
+    }
+
     func setActive(_ effect: ShaderEffectDescriptor) {
         renderer.activateShader(effect)
         objectWillChange.send()
+    }
+
+    func reloadPackages() {
+        renderer.reloadShaderPackages()
+        if selectedShaderID == nil || !renderer.packageRegistry.effects.contains(where: { $0.id == selectedShaderID }) {
+            selectedShaderID = renderer.packageRegistry.effects.first?.id
+        }
+        objectWillChange.send()
+    }
+
+    func openPackagesFolder() {
+        let folderURL = ShaderPackageRegistryBuilder.installedShaderPackagesRoot()
+        do {
+            try FileManager.default.createDirectory(at: folderURL, withIntermediateDirectories: true)
+            NSWorkspace.shared.open(folderURL)
+        } catch {
+            renderer.packageDiagnostics.append(
+                ShaderPackageDiagnostic(
+                    severity: .error,
+                    code: .packageFolderOpenFailed,
+                    message: "Could not open Shader Packages folder: \(error.localizedDescription)",
+                    packageID: nil,
+                    packageDisplayName: "Shader Packages Folder",
+                    source: .installed,
+                    packageURL: folderURL
+                )
+            )
+            objectWillChange.send()
+        }
+    }
+
+    func importPackage() {
+        let panel = NSOpenPanel()
+        panel.canChooseDirectories = true
+        panel.canChooseFiles = true
+        panel.allowsMultipleSelection = false
+        panel.allowsOtherFileTypes = true
+        guard panel.runModal() == .OK, let url = panel.url else { return }
+
+        do {
+            _ = try ShaderPackageInstaller.importPackage(from: url)
+            reloadPackages()
+        } catch {
+            renderer.packageDiagnostics.append(
+                ShaderPackageDiagnostic(
+                    severity: .error,
+                    code: .importFailed,
+                    message: "Import failed: \(error.localizedDescription)",
+                    packageID: nil,
+                    packageDisplayName: url.lastPathComponent,
+                    source: .installed,
+                    packageURL: url
+                )
+            )
+            objectWillChange.send()
+        }
+    }
+
+    func showDiagnostics() {
+        let view = ShaderPackageDiagnosticsView(diagnostics: renderer.packageDiagnostics)
+        let window = NSWindow(contentViewController: NSHostingController(rootView: view))
+        window.title = "Shader Package Diagnostics"
+        window.styleMask = [.titled, .closable, .resizable]
+        window.center()
+        window.makeKeyAndOrderFront(nil)
+        NSApp.activate(ignoringOtherApps: true)
     }
 }
 
@@ -67,6 +137,12 @@ struct ShaderLibraryWindowView: View {
                         .font(.title2)
                         .bold()
                     Spacer()
+                    Button("Import…") { state.importPackage() }
+                    Button("Reload") { state.reloadPackages() }
+                    Button("Open Packages Folder") { state.openPackagesFolder() }
+                    if state.hasDiagnostics {
+                        Button("Diagnostics") { state.showDiagnostics() }
+                    }
                 }
 
                 Picker("Filter", selection: $state.selectedFilter) {
