@@ -48,9 +48,7 @@ struct ShaderPackageInstaller {
     }
 
     private static func extractArchive(_ archiveURL: URL, to stagingRoot: URL) throws -> URL {
-        guard let archive = Archive(url: archiveURL, accessMode: .read) else {
-            throw ShaderPackageInstallerError.invalidArchive("Could not open archive.")
-        }
+        let archive = try Archive(url: archiveURL, accessMode: .read)
         let extractRoot = stagingRoot.appendingPathComponent("archive", isDirectory: true)
         try FileManager.default.createDirectory(at: extractRoot, withIntermediateDirectories: true)
 

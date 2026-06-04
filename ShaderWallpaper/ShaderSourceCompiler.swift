@@ -127,7 +127,7 @@ struct ShaderSourceCompiler {
         }
 
         let options = MTLCompileOptions()
-        options.fastMathEnabled = true
+        options.mathMode = .fast
         if options.responds(to: Selector(("setIncludeSearchPaths:"))) {
             options.setValue([shader.packageURL.path], forKey: "includeSearchPaths")
         }

@@ -60,6 +60,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
     private var activePackageTextures: [(index: Int, texture: MTLTexture)] = []
     private var lastDesktopTextureRefresh = Date.distantPast
     private let desktopTextureRefreshInterval: TimeInterval = 300
+    private var isLoadingDesktopTexture = false
     private var activeSpaceObserver: NSObjectProtocol?
     private var lastMousePosition = SIMD4<Float>(0, 0, 0, 0)
     
@@ -147,7 +148,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
             return
         }
 
-        loadDesktopTexture()
+        requestDesktopTextureLoad()
 
         for delay in [0.5, 1.5, 3.0] {
             DispatchQueue.main.asyncAfter(deadline: .now() + delay) { [weak self] in
@@ -155,7 +156,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
                     return
                 }
 
-                self?.loadDesktopTexture()
+                self?.requestDesktopTextureLoad()
             }
         }
     }
@@ -164,25 +165,48 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
         resyncDesktopTexture()
     }
     
-    private func loadDesktopTexture() {
+    private func requestDesktopTextureLoad() {
+        guard !isLoadingDesktopTexture else {
+            return
+        }
+
         lastDesktopTextureRefresh = Date()
+        isLoadingDesktopTexture = true
+
+        if desktopTexture == nil {
+            desktopTexture = makeFallbackDesktopTexture()
+        }
 
         guard
             let screen = metalView?.window?.screen ?? NSScreen.main,
             let imageURL = NSWorkspace.shared.desktopImageURL(for: screen)
         else {
             print("Failed to find desktop image URL")
-            desktopTexture = makeFallbackDesktopTexture()
+            isLoadingDesktopTexture = false
             return
         }
 
-        if let texture = makeDesktopTexture(from: imageURL) {
-            desktopTexture = texture
-            return
-        }
+        let candidateURLs = desktopTextureCandidateURLs(for: imageURL)
+        DispatchQueue.global(qos: .utility).async { [weak self] in
+            guard let self else { return }
+            let texture = makeDesktopTexture(from: candidateURLs)
 
-        print("Failed to load desktop texture from \(imageURL.path)")
-        desktopTexture = makeFallbackDesktopTexture()
+            DispatchQueue.main.async { [weak self] in
+                guard let self else { return }
+                isLoadingDesktopTexture = false
+
+                guard currentShader?.resources.contains(.desktopTexture) == true else {
+                    return
+                }
+
+                if let texture {
+                    desktopTexture = texture
+                } else {
+                    print("Failed to load desktop texture from \(imageURL.path)")
+                    desktopTexture = makeFallbackDesktopTexture()
+                }
+            }
+        }
     }
 
     private func refreshDesktopTextureIfNeeded() {
@@ -193,17 +217,17 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
             return
         }
 
-        loadDesktopTexture()
+        requestDesktopTextureLoad()
     }
 
-    private func makeDesktopTexture(from imageURL: URL) -> MTLTexture? {
+    private func makeDesktopTexture(from candidateURLs: [URL]) -> MTLTexture? {
         let textureLoader = MTKTextureLoader(device: device)
         let textureOptions: [MTKTextureLoader.Option: Any] = [
             .SRGB: false,
             .textureUsage: MTLTextureUsage.shaderRead.rawValue
         ]
 
-        for candidateURL in desktopTextureCandidateURLs(for: imageURL) {
+        for candidateURL in candidateURLs {
             if let texture = makeTexture(
                 from: candidateURL,
                 textureLoader: textureLoader,
@@ -311,7 +335,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
     private func prepareResources(for shader: ShaderEffectDescriptor) {
         if shader.resources.contains(.desktopTexture) {
             if desktopTexture == nil {
-                loadDesktopTexture()
+                requestDesktopTextureLoad()
             }
         } else {
             desktopTexture = nil
@@ -372,7 +396,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
             var reflection: MTLAutoreleasedRenderPipelineReflection?
             let newPipelineState = try device.makeRenderPipelineState(
                 descriptor: pipelineDescriptor,
-                options: [.argumentInfo],
+                options: [.bindingInfo],
                 reflection: &reflection
             )
             let bindings = try loadPackageTextures(for: shader, reflection: reflection)
@@ -401,7 +425,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
     ) throws -> (desktopTextureIndex: Int, packageTextures: [(index: Int, texture: MTLTexture)]) {
         let declaredTextures = shader.manifest.assets?.textures ?? []
         let declaredByName = Dictionary(uniqueKeysWithValues: declaredTextures.map { ($0.name, $0) })
-        let fragmentTextureArguments = (reflection?.fragmentArguments ?? []).filter { $0.type == .texture }
+        let fragmentTextureArguments = (reflection?.fragmentBindings ?? []).filter { $0.type == .texture }
         let textureArgumentByName = Dictionary(uniqueKeysWithValues: fragmentTextureArguments.map { ($0.name, $0) })
         let reservedTextureNames: Set<String> = ["desktopTexture"]
         var loadedTextures: [(index: Int, texture: MTLTexture)] = []
@@ -559,7 +583,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
             refreshDesktopTextureIfNeeded()
 
             if desktopTexture == nil {
-                loadDesktopTexture()
+                requestDesktopTextureLoad()
             }
 
             if let desktopTexture {
