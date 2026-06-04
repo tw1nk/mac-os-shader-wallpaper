@@ -242,9 +242,19 @@ private struct ShaderEffectThumbnailPlaceholder: View {
     }
 
     private var previewImage: NSImage? {
-        guard let imagePath = effect.manifest.preview?.image else { return nil }
-        let imageURL = effect.packageURL.appendingPathComponent(imagePath)
-        return NSImage(contentsOf: imageURL)
+        if let imagePath = effect.manifest.preview?.image {
+            let imageURL = effect.packageURL.appendingPathComponent(imagePath)
+            if let image = NSImage(contentsOf: imageURL) {
+                return image
+            }
+        }
+
+        return ShaderThumbnailCache.cachedOrGenerateThumbnail(for: effect, aspectRatio: currentDisplayAspectRatio)
+    }
+
+    private var currentDisplayAspectRatio: CGFloat {
+        guard let screen = NSScreen.main, screen.frame.height > 0 else { return 16.0 / 9.0 }
+        return screen.frame.width / screen.frame.height
     }
 }
 
