@@ -49,6 +49,11 @@ final class ShaderLibraryState: ObservableObject {
     var activeShaderID: String? {
         renderer.currentShader?.id
     }
+
+    func setActive(_ effect: ShaderEffectDescriptor) {
+        renderer.activateShader(effect)
+        objectWillChange.send()
+    }
 }
 
 struct ShaderLibraryWindowView: View {
@@ -293,14 +298,24 @@ private struct ShaderLibraryDetailPane: View {
             Divider()
 
             if let selectedEffect {
-                Text(selectedEffect.name)
-                    .font(.headline)
+                HStack {
+                    Text(selectedEffect.name)
+                        .font(.headline)
+                    if selectedEffect.id == state.activeShaderID {
+                        Badge(text: "Active", color: .green)
+                    }
+                }
                 Text(selectedEffect.manifest.description ?? "No description provided.")
                     .foregroundStyle(.secondary)
                 Text(selectedEffect.id)
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
+
+                Button(selectedEffect.id == state.activeShaderID ? "Active" : "Set Active") {
+                    state.setActive(selectedEffect)
+                }
+                .disabled(selectedEffect.id == state.activeShaderID)
             } else {
                 Text("Select a Shader Effect")
                     .font(.headline)

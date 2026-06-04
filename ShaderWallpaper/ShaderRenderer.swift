@@ -108,6 +108,11 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
         return registry.effects.first
     }
 
+    func activateShader(_ shader: ShaderEffectDescriptor) {
+        guard let metalView else { return }
+        loadShader(shader, for: metalView)
+    }
+
     func reloadShaderPackages() {
         let selectedID = currentShader?.id ?? UserDefaults.standard.string(forKey: ShaderEffectDescriptor.storageKey)
         packageRegistry = ShaderPackageRegistryBuilder.defaultBuilder().build()
