@@ -605,6 +605,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         openPackagesFolderItem.target = self
         menu.addItem(openPackagesFolderItem)
 
+        let newPackageItem = NSMenuItem(
+            title: "New Shader Package…",
+            action: #selector(newShaderPackage),
+            keyEquivalent: ""
+        )
+        newPackageItem.target = self
+        menu.addItem(newPackageItem)
+
         let importPackagesItem = NSMenuItem(
             title: "Import .wallshader or Folder…",
             action: #selector(importShaderPackage),
@@ -777,6 +785,44 @@ class AppDelegate: NSObject, NSApplicationDelegate {
                 )
             )
             rebuildMenu()
+        }
+    }
+
+    @objc func newShaderPackage() {
+        NSApp.setActivationPolicy(.regular)
+        let alert = NSAlert()
+        alert.messageText = "New Shader Package"
+        alert.informativeText = "Create an editable installed source-backed Shader Package."
+        alert.addButton(withTitle: "Create")
+        alert.addButton(withTitle: "Cancel")
+
+        let stack = NSStackView()
+        stack.orientation = .vertical
+        stack.spacing = 8
+        stack.frame = NSRect(x: 0, y: 0, width: 360, height: 96)
+        let nameField = NSTextField(string: "")
+        nameField.placeholderString = "Name, e.g. Aurora Ripple"
+        let idField = NSTextField(string: "")
+        idField.placeholderString = "id, e.g. com.example.wallshader.aurora-ripple"
+        stack.addArrangedSubview(nameField)
+        stack.addArrangedSubview(idField)
+        alert.accessoryView = stack
+
+        guard alert.runModal() == .alertFirstButtonReturn else { return }
+
+        do {
+            let effect = try ShaderPackageAuthoring.createNewPackage(
+                name: nameField.stringValue,
+                id: idField.stringValue,
+                existingRegistry: renderer.packageRegistry
+            )
+            renderer.reloadShaderPackages()
+            rebuildMenu()
+            openShaderEditor(for: effect)
+        } catch {
+            let errorAlert = NSAlert(error: error)
+            errorAlert.messageText = "Could not create Shader Package"
+            errorAlert.runModal()
         }
     }
 

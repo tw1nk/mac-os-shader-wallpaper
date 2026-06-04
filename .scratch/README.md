@@ -12,7 +12,7 @@ Previous shader package issues `SCRATCH-0001` through `SCRATCH-0014` were comple
 - [SCRATCH-0022: Surface diagnostics and Error Shader state in Shader Library](issues/0022-surface-diagnostics-and-error-shader-state-in-shader-library.md) — closed
 - [SCRATCH-0023: Add explicit manifest permission for Shader Editor Window eligibility](issues/0023-add-explicit-manifest-permission-for-shader-editor-window-eligibility.md) — closed
 - [SCRATCH-0024: Show Edit entry point only for editable Shader Effects](issues/0024-show-edit-entry-point-only-for-editable-shader-effects.md) — closed
-- [SCRATCH-0025: Create new editable Shader Packages from the status menu](issues/0025-create-new-editable-shader-packages-from-the-status-menu.md) — open
+- [SCRATCH-0025: Create new editable Shader Packages from the status menu](issues/0025-create-new-editable-shader-packages-from-the-status-menu.md) — closed
 - [SCRATCH-0026: Open one Shader Editor Window per package](issues/0026-open-one-shader-editor-window-per-package.md) — closed
 - [SCRATCH-0027: Edit manifest and source buffers with explicit save](issues/0027-edit-manifest-and-source-buffers-with-explicit-save.md) — open
 - [SCRATCH-0028: Add basic syntax coloring editor](issues/0028-add-basic-syntax-coloring-editor.md) — open
