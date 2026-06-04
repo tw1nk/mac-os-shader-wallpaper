@@ -7,6 +7,7 @@ final class ShaderEditorState: ObservableObject {
     @Published var manifestText = ""
     @Published var sourceText = ""
     @Published var diagnostics: [String] = []
+    @Published var previewEffect: ShaderEffectDescriptor?
     @Published var isDirty = false
     @Published var packageExists = true
 
@@ -19,6 +20,7 @@ final class ShaderEditorState: ObservableObject {
         packageURL = effect.packageURL
         effectName = effect.name
         loadFromDisk()
+        reloadPreview()
     }
 
     func loadFromDisk() {
@@ -76,10 +78,30 @@ final class ShaderEditorState: ObservableObject {
                 savedSourceText = sourceText
             }
             isDirty = false
-            diagnostics.append("Saved.")
+            reloadPreview()
         } catch {
             diagnostics.append("Save failed: \(error.localizedDescription)")
         }
+    }
+
+    func reloadPreview() {
+        let candidate = ShaderPackageValidator.validatePackage(at: packageURL, source: .installed)
+        diagnostics = candidate.diagnostics.map { "\($0.severity.rawValue.capitalized): \($0.message)" }
+        guard candidate.isSelectable, let manifest = candidate.manifest else {
+            if diagnostics.isEmpty { diagnostics.append("Package is not valid.") }
+            return
+        }
+        let effect = ShaderEffectDescriptor(
+            id: manifest.id,
+            name: manifest.name,
+            packageURL: packageURL,
+            source: .installed,
+            manifest: manifest,
+            diagnostics: candidate.diagnostics
+        )
+        previewEffect = effect
+        effectName = manifest.name
+        if diagnostics.isEmpty { diagnostics.append("Saved and preview reloaded.") }
     }
 
     private func updateDirtyState() {
@@ -144,6 +166,14 @@ struct ShaderEditorWindowView: View {
                         isEditable: state.packageExists
                     )
                 }
+            }
+
+            VStack(alignment: .leading) {
+                Text("Preview")
+                    .font(.headline)
+                ShaderLivePreviewView(effect: state.previewEffect)
+                    .clipShape(RoundedRectangle(cornerRadius: 10))
+                    .frame(minHeight: 180)
             }
 
             if !state.diagnostics.isEmpty {
