@@ -1,0 +1,9 @@
+manifestVersion: 1
+shaderInterfaceVersion: 1
+id: com.github.tw1nk.wallshader.apple-logo
+name: Apple Logo
+version: 1.0.0
+fragmentFunction: appleLogoShader
+library: shader.metallib
+resources: []
+menuOrder: 90

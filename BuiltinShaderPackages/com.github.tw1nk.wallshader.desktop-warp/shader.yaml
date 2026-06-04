@@ -1,0 +1,11 @@
+manifestVersion: 1
+shaderInterfaceVersion: 1
+id: com.github.tw1nk.wallshader.desktop-warp
+name: Desktop Warp
+version: 1.0.0
+fragmentFunction: desktopWarpShader
+library: shader.metallib
+resources:
+  - mouse
+  - desktopTexture
+menuOrder: 110

@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://tw1nk.github.io/mac-os-shader-wallpaper/schemas/shader-manifest.schema.json",
+  "title": "Shader Wallpaper Manifest",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "manifestVersion",
+    "shaderInterfaceVersion",
+    "id",
+    "name",
+    "version",
+    "fragmentFunction",
+    "resources"
+  ],
+  "oneOf": [
+    { "required": ["source"], "not": { "required": ["library"] } },
+    { "required": ["library"], "not": { "required": ["source"] } }
+  ],
+  "properties": {
+    "manifestVersion": { "type": "integer", "minimum": 1, "const": 1 },
+    "shaderInterfaceVersion": { "type": "integer", "minimum": 1 },
+    "id": {
+      "type": "string",
+      "pattern": "^[a-z0-9-]+(\\.[a-z0-9-]+)+$"
+    },
+    "name": { "type": "string", "minLength": 1 },
+    "version": {
+      "type": "string",
+      "pattern": "^(0|[1-9]\\d*)\\.(0|[1-9]\\d*)\\.(0|[1-9]\\d*)(?:-([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?(?:\\+([0-9A-Za-z-]+(?:\\.[0-9A-Za-z-]+)*))?$"
+    },
+    "description": { "type": "string" },
+    "author": { "type": "string" },
+    "homepage": { "type": "string", "format": "uri" },
+    "license": { "type": "string" },
+    "fragmentFunction": {
+      "type": "string",
+      "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+    },
+    "source": { "type": "string", "minLength": 1 },
+    "library": { "type": "string", "minLength": 1 },
+    "resources": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "textures": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "additionalProperties": true,
+            "required": ["name", "path"],
+            "properties": {
+              "name": {
+                "type": "string",
+                "pattern": "^[A-Za-z_][A-Za-z0-9_]*$"
+              },
+              "path": { "type": "string", "minLength": 1 }
+            }
+          }
+        }
+      }
+    },
+    "menuOrder": { "type": "integer" }
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "originHash" : "eb8ada6537e51d880a409879180bdf82cb7aef939e0076a563a4e3e39c294993",
+  "pins" : [
+    {
+      "identity" : "yams",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:jpsim/Yams.git",
+      "state" : {
+        "revision" : "3d6871d5b4a5cd519adf233fbb576e0a2af71c17"
+      }
+    },
+    {
+      "identity" : "zipfoundation",
+      "kind" : "remoteSourceControl",
+      "location" : "git@github.com:weichsel/ZIPFoundation.git",
+      "state" : {
+        "revision" : "22787ffb59de99e5dc1fbfe80b19c97a904ad48d"
+      }
+    }
+  ],
+  "version" : 3
+}

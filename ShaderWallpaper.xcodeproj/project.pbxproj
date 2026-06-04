@@ -6,8 +6,24 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		A10000012F30000100000001 /* Yams in Frameworks */ = {isa = PBXBuildFile; productRef = A10000022F30000100000001 /* Yams */; };
+		A40000012F30001300000001 /* ZIPFoundation in Frameworks */ = {isa = PBXBuildFile; productRef = A40000022F30001300000001 /* ZIPFoundation */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		A20000092F30000200000001 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 58ABCBDF2F213BED00207FE8 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 58ABCBE62F213BED00207FE8;
+			remoteInfo = ShaderWallpaper;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
 		58ABCBE72F213BED00207FE8 /* ShaderWallpaper.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = ShaderWallpaper.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		A20000012F30000200000001 /* ShaderWallpaperTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ShaderWallpaperTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -16,10 +32,24 @@
 			path = ShaderWallpaper;
 			sourceTree = "<group>";
 		};
+		A20000022F30000200000001 /* ShaderWallpaperTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = ShaderWallpaperTests;
+			sourceTree = "<group>";
+		};
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		58ABCBE42F213BED00207FE8 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10000012F30000100000001 /* Yams in Frameworks */,
+				A40000012F30001300000001 /* ZIPFoundation in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		A20000032F30000200000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -33,6 +63,7 @@
 			isa = PBXGroup;
 			children = (
 				58ABCBE92F213BED00207FE8 /* ShaderWallpaper */,
+				A20000022F30000200000001 /* ShaderWallpaperTests */,
 				58ABCBE82F213BED00207FE8 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -41,6 +72,7 @@
 			isa = PBXGroup;
 			children = (
 				58ABCBE72F213BED00207FE8 /* ShaderWallpaper.app */,
+				A20000012F30000200000001 /* ShaderWallpaperTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -55,6 +87,7 @@
 				58ABCBE32F213BED00207FE8 /* Sources */,
 				58ABCBE42F213BED00207FE8 /* Frameworks */,
 				58ABCBE52F213BED00207FE8 /* Resources */,
+				A30000012F30000500000001 /* Bundle Built-in Shader Packages */,
 			);
 			buildRules = (
 			);
@@ -65,10 +98,35 @@
 			);
 			name = ShaderWallpaper;
 			packageProductDependencies = (
+				A10000022F30000100000001 /* Yams */,
+				A40000022F30001300000001 /* ZIPFoundation */,
 			);
 			productName = ShaderWallpaper;
 			productReference = 58ABCBE72F213BED00207FE8 /* ShaderWallpaper.app */;
 			productType = "com.apple.product-type.application";
+		};
+		A20000042F30000200000001 /* ShaderWallpaperTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = A20000082F30000200000001 /* Build configuration list for PBXNativeTarget "ShaderWallpaperTests" */;
+			buildPhases = (
+				A20000052F30000200000001 /* Sources */,
+				A20000032F30000200000001 /* Frameworks */,
+				A20000062F30000200000001 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				A20000072F30000200000001 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				A20000022F30000200000001 /* ShaderWallpaperTests */,
+			);
+			name = ShaderWallpaperTests;
+			packageProductDependencies = (
+			);
+			productName = ShaderWallpaperTests;
+			productReference = A20000012F30000200000001 /* ShaderWallpaperTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
 		};
 /* End PBXNativeTarget section */
 
@@ -83,6 +141,9 @@
 					58ABCBE62F213BED00207FE8 = {
 						CreatedOnToolsVersion = 26.2;
 					};
+					A20000042F30000200000001 = {
+						CreatedOnToolsVersion = 26.2;
+					};
 				};
 			};
 			buildConfigurationList = 58ABCBE22F213BED00207FE8 /* Build configuration list for PBXProject "ShaderWallpaper" */;
@@ -94,12 +155,17 @@
 			);
 			mainGroup = 58ABCBDE2F213BED00207FE8;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				A10000032F30000100000001 /* XCRemoteSwiftPackageReference "Yams" */,
+				A40000032F30001300000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = 58ABCBE82F213BED00207FE8 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
 				58ABCBE62F213BED00207FE8 /* ShaderWallpaper */,
+				A20000042F30000200000001 /* ShaderWallpaperTests */,
 			);
 		};
 /* End PBXProject section */
@@ -112,7 +178,39 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A20000062F30000200000001 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXResourcesBuildPhase section */
+
+/* Begin PBXShellScriptBuildPhase section */
+		A30000012F30000500000001 /* Bundle Built-in Shader Packages */ = {
+			isa = PBXShellScriptBuildPhase;
+			alwaysOutOfDate = 1;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			inputFileListPaths = (
+			);
+			inputPaths = (
+				"$(SRCROOT)/BuiltinShaderPackages",
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/default.metallib",
+			);
+			name = "Bundle Built-in Shader Packages";
+			outputFileListPaths = (
+			);
+			outputPaths = (
+				"$(TARGET_BUILD_DIR)/$(UNLOCALIZED_RESOURCES_FOLDER_PATH)/Shaders",
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+			shellPath = /bin/sh;
+			shellScript = "set -eu\nSOURCE_ROOT=\"$SRCROOT/BuiltinShaderPackages\"\nDEST_ROOT=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/Shaders\"\nDEFAULT_LIBRARY=\"$TARGET_BUILD_DIR/$UNLOCALIZED_RESOURCES_FOLDER_PATH/default.metallib\"\n\nrm -rf \"$DEST_ROOT\"\nmkdir -p \"$DEST_ROOT\"\n\nif [ ! -d \"$SOURCE_ROOT\" ]; then\n  exit 0\nfi\n\nfor package in \"$SOURCE_ROOT\"/*; do\n  [ -d \"$package\" ] || continue\n  id=$(basename \"$package\")\n  dest=\"$DEST_ROOT/$id\"\n  mkdir -p \"$dest\"\n  cp \"$package/shader.yaml\" \"$dest/shader.yaml\"\n  if [ -f \"$DEFAULT_LIBRARY\" ]; then\n    cp \"$DEFAULT_LIBRARY\" \"$dest/shader.metallib\"\n  fi\ndone\n";
+		};
+/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		58ABCBE32F213BED00207FE8 /* Sources */ = {
@@ -122,7 +220,22 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		A20000052F30000200000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		A20000072F30000200000001 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 58ABCBE62F213BED00207FE8 /* ShaderWallpaper */;
+			targetProxy = A20000092F30000200000001 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
 		58ABCBF02F213BEE00207FE8 /* Debug */ = {
@@ -254,19 +367,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = DSMGFPVTKW;
+				DEVELOPMENT_TEAM = 94G876PWK5;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Shader Wallpaper";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ShaderWallpaper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -289,19 +402,19 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
 				CURRENT_PROJECT_VERSION = 1;
 				DEAD_CODE_STRIPPING = YES;
-				DEVELOPMENT_TEAM = DSMGFPVTKW;
+				DEVELOPMENT_TEAM = 94G876PWK5;
 				ENABLE_APP_SANDBOX = YES;
 				ENABLE_HARDENED_RUNTIME = YES;
 				ENABLE_PREVIEWS = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = NO;
 				ENABLE_USER_SELECTED_FILES = readonly;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Shader Wallpaper";
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.games";
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = ShaderWallpaper/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
 					"@executable_path/../Frameworks",
@@ -316,6 +429,40 @@
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
 				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		A200000A2F30000200000001 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 94G876PWK5;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				PRODUCT_BUNDLE_IDENTIFIER = nando.ShaderWallpaperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ShaderWallpaper.app/Contents/MacOS/ShaderWallpaper";
+			};
+			name = Debug;
+		};
+		A200000B2F30000200000001 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "-";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 94G876PWK5;
+				GENERATE_INFOPLIST_FILE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 26.2;
+				PRODUCT_BUNDLE_IDENTIFIER = nando.ShaderWallpaperTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/ShaderWallpaper.app/Contents/MacOS/ShaderWallpaper";
 			};
 			name = Release;
 		};
@@ -340,7 +487,48 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
+		A20000082F30000200000001 /* Build configuration list for PBXNativeTarget "ShaderWallpaperTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				A200000A2F30000200000001 /* Debug */,
+				A200000B2F30000200000001 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		A10000032F30000100000001 /* XCRemoteSwiftPackageReference "Yams" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:jpsim/Yams.git";
+			requirement = {
+				kind = revision;
+				revision = 3d6871d5b4a5cd519adf233fbb576e0a2af71c17;
+			};
+		};
+		A40000032F30001300000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "git@github.com:weichsel/ZIPFoundation.git";
+			requirement = {
+				kind = revision;
+				revision = 22787ffb59de99e5dc1fbfe80b19c97a904ad48d;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		A10000022F30000100000001 /* Yams */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A10000032F30000100000001 /* XCRemoteSwiftPackageReference "Yams" */;
+			productName = Yams;
+		};
+		A40000022F30001300000001 /* ZIPFoundation */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = A40000032F30001300000001 /* XCRemoteSwiftPackageReference "ZIPFoundation" */;
+			productName = ZIPFoundation;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 58ABCBDF2F213BED00207FE8 /* Project object */;
 }

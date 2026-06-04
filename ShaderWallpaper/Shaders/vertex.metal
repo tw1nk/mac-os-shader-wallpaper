@@ -13,8 +13,8 @@ using namespace metal;
 // =====================
 // Vertex shader
 // =====================
-vertex VertexOut vertexShader(uint vertexID [[vertex_id]]) {
-    VertexOut out;
+vertex ShaderWallpaperVertexOut vertexShader(uint vertexID [[vertex_id]]) {
+    ShaderWallpaperVertexOut out;
 
     float2 positions[6] = {
         float2(-1.0, -1.0),

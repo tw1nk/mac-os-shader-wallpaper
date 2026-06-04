@@ -1,0 +1,9 @@
+manifestVersion: 1
+shaderInterfaceVersion: 1
+id: com.github.xxidbr9.wallshader.balatro
+name: Balatro (Original)
+version: 1.0.0
+fragmentFunction: balatroShader
+library: shader.metallib
+resources: []
+menuOrder: 10

@@ -1,0 +1,10 @@
+manifestVersion: 1
+shaderInterfaceVersion: 1
+id: com.github.tw1nk.wallshader.mouse-ripple
+name: Mouse Ripple
+version: 1.0.0
+fragmentFunction: mouseRippleShader
+library: shader.metallib
+resources:
+  - mouse
+menuOrder: 100
