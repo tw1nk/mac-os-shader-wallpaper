@@ -27,19 +27,29 @@ struct SyntaxHighlightingTextView: NSViewRepresentable {
         scroll.hasHorizontalScroller = true
         scroll.drawsBackground = true
         scroll.backgroundColor = Self.editorBackgroundColor
-        let textView = NSTextView()
-        textView.isRichText = false
+        let textView = NSTextView(frame: scroll.contentView.bounds)
+        textView.isRichText = true
+        textView.importsGraphics = false
+        textView.usesFontPanel = false
+        textView.allowsDocumentBackgroundColorChange = false
         textView.isEditable = isEditable
         textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.font = .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        textView.minSize = NSSize(width: 0, height: scroll.contentSize.height)
+        textView.maxSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        textView.isVerticallyResizable = true
+        textView.isHorizontallyResizable = true
+        textView.autoresizingMask = [.width]
+        textView.textContainer?.containerSize = NSSize(width: CGFloat.greatestFiniteMagnitude, height: CGFloat.greatestFiniteMagnitude)
+        textView.textContainer?.widthTracksTextView = false
         textView.drawsBackground = true
         textView.backgroundColor = Self.editorBackgroundColor
         textView.textColor = Self.editorTextColor
         textView.insertionPointColor = Self.editorTextColor
         textView.typingAttributes = Self.baseTypingAttributes
         textView.delegate = context.coordinator
-        textView.string = text
+        textView.textStorage?.setAttributedString(NSAttributedString(string: text, attributes: Self.baseTypingAttributes))
         scroll.documentView = textView
         context.coordinator.textView = textView
         context.coordinator.highlightSoon()
