@@ -684,7 +684,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             return
         }
 
-        let controller = ShaderEditorWindowController(effect: effect)
+        let controller = ShaderEditorWindowController(effect: effect, renderer: renderer)
         controller.onClose = { [weak self] url in
             self?.shaderEditorWindowControllers[url.standardizedFileURL] = nil
             if self?.shaderLibraryWindowController == nil && self?.shaderEditorWindowControllers.isEmpty == true {

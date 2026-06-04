@@ -3,6 +3,7 @@ import Combine
 
 final class ShaderEditorState: ObservableObject {
     let packageURL: URL
+    weak var activeRenderer: ShaderRenderer?
     @Published var effectName: String
     @Published var manifestText = ""
     @Published var sourceText = ""
@@ -16,8 +17,9 @@ final class ShaderEditorState: ObservableObject {
     private var savedManifestText = ""
     private var savedSourceText = ""
 
-    init(effect: ShaderEffectDescriptor) {
+    init(effect: ShaderEffectDescriptor, renderer: ShaderRenderer? = nil) {
         packageURL = effect.packageURL
+        activeRenderer = renderer
         effectName = effect.name
         loadFromDisk()
         reloadPreview()
@@ -67,6 +69,7 @@ final class ShaderEditorState: ObservableObject {
         guard packageExists else { return }
         diagnostics.removeAll()
         do {
+            let activeIDBeforeSave = activeRenderer?.currentShader?.id
             if manifestText != savedManifestText {
                 guard let manifestURL else { throw ShaderEditorSaveError.missingManifestURL }
                 try manifestText.write(to: manifestURL, atomically: true, encoding: .utf8)
@@ -79,6 +82,9 @@ final class ShaderEditorState: ObservableObject {
             }
             isDirty = false
             reloadPreview()
+            if let previewEffect, previewEffect.id == activeIDBeforeSave {
+                activeRenderer?.activateShader(previewEffect)
+            }
         } catch {
             diagnostics.append("Save failed: \(error.localizedDescription)")
         }
@@ -201,9 +207,9 @@ final class ShaderEditorWindowController: NSWindowController, NSWindowDelegate {
     private var cancellables: Set<AnyCancellable> = []
     var onClose: ((URL) -> Void)?
 
-    init(effect: ShaderEffectDescriptor) {
+    init(effect: ShaderEffectDescriptor, renderer: ShaderRenderer? = nil) {
         self.packageURL = effect.packageURL.standardizedFileURL
-        self.state = ShaderEditorState(effect: effect)
+        self.state = ShaderEditorState(effect: effect, renderer: renderer)
         let hostingController = NSHostingController(rootView: ShaderEditorWindowView(state: state))
         let window = NSWindow(contentViewController: hostingController)
         window.title = "Shader Editor — \(effect.name)"

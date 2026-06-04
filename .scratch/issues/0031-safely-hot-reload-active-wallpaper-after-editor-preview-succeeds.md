@@ -1,6 +1,6 @@
 # SCRATCH-0031: Safely hot reload active wallpaper after editor preview succeeds
 
-Status: open
+Status: closed
 Type: AFK
 
 ## What to build
@@ -9,10 +9,10 @@ When the edited Shader Effect is active, reload the active wallpaper only after 
 
 ## Acceptance criteria
 
-- [ ] Active wallpaper reloads after successful editor preview when the effect id is unchanged and active.
-- [ ] Active wallpaper is not reloaded after failed validation or compile.
-- [ ] Active wallpaper keeps its last-good state if its own reload fails.
-- [ ] Changing manifest id does not automatically move active selection to the new id.
+- [x] Active wallpaper reloads after successful editor preview when the effect id is unchanged and active.
+- [x] Active wallpaper is not reloaded after failed validation or compile.
+- [x] Active wallpaper keeps its last-good state if its own reload fails.
+- [x] Changing manifest id does not automatically move active selection to the new id.
 
 ## Blocked by
 
