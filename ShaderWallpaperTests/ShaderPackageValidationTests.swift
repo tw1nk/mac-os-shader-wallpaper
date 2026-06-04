@@ -144,6 +144,57 @@ final class ShaderPackageValidationTests: XCTestCase {
         XCTAssertTrue(candidate.diagnostics.contains { $0.message.contains("colorSpace") && $0.severity == .warning })
     }
 
+    func testEditableManifestFieldControlsEditorEligibility() throws {
+        let editablePackage = try makePackage(manifest: validManifest(id: "com.example.wallshader.editable", name: "Editable", extra: "editable: true"))
+        try write("// shader", to: editablePackage.appendingPathComponent("shader.metal"))
+        let omittedPackage = try makePackage(manifest: validManifest(id: "com.example.wallshader.omitted", name: "Omitted"))
+        try write("// shader", to: omittedPackage.appendingPathComponent("shader.metal"))
+        let falsePackage = try makePackage(manifest: validManifest(id: "com.example.wallshader.false", name: "False", extra: "editable: false"))
+        try write("// shader", to: falsePackage.appendingPathComponent("shader.metal"))
+        let libraryPackage = try makePackage(manifest: """
+        manifestVersion: 1
+        shaderInterfaceVersion: 1
+        id: com.example.wallshader.library-editable
+        name: Library Editable
+        version: 1.0.0
+        fragmentFunction: libraryShader
+        library: shader.metallib
+        resources: []
+        editable: true
+        """)
+        try write("library", to: libraryPackage.appendingPathComponent("shader.metallib"))
+
+        let installedRoot = try makeTemporaryDirectory()
+        let bundledRoot = try makeTemporaryDirectory()
+        for package in [editablePackage, omittedPackage, falsePackage, libraryPackage] {
+            try FileManager.default.moveItem(at: package, to: installedRoot.appendingPathComponent(package.lastPathComponent))
+        }
+        let bundledEditable = bundledRoot.appendingPathComponent("bundled")
+        try FileManager.default.createDirectory(at: bundledEditable, withIntermediateDirectories: true)
+        try write(validManifest(id: "com.example.wallshader.bundled-editable", name: "Bundled", extra: "editable: true"), to: bundledEditable.appendingPathComponent("shader.yaml"))
+        try write("// shader", to: bundledEditable.appendingPathComponent("shader.metal"))
+
+        let registry = ShaderPackageRegistryBuilder(bundledRootURL: bundledRoot, installedRootURL: installedRoot).build()
+        let editabilityByID = Dictionary(uniqueKeysWithValues: registry.effects.map { ($0.id, $0.isEditable) })
+
+        XCTAssertEqual(editabilityByID["com.example.wallshader.editable"], true)
+        XCTAssertEqual(editabilityByID["com.example.wallshader.omitted"], false)
+        XCTAssertEqual(editabilityByID["com.example.wallshader.false"], false)
+        XCTAssertEqual(editabilityByID["com.example.wallshader.library-editable"], false)
+        XCTAssertEqual(editabilityByID["com.example.wallshader.bundled-editable"], false)
+    }
+
+    func testInvalidEditableValueWarnsButDoesNotEnableEditing() throws {
+        let package = try makePackage(manifest: validManifest(id: "com.example.wallshader.invalid-editable", name: "Invalid Editable", extra: "editable: \"true\""))
+        try write("// shader", to: package.appendingPathComponent("shader.metal"))
+
+        let candidate = ShaderPackageValidator.validatePackage(at: package, source: .installed)
+
+        XCTAssertTrue(candidate.isSelectable)
+        XCTAssertNil(candidate.manifest?.editable)
+        XCTAssertTrue(candidate.diagnostics.contains { $0.code == .invalidEditablePermission && $0.severity == .warning })
+    }
+
     func testInstalledMenuOrderWarns() throws {
         let package = try makePackage(manifest: """
         manifestVersion: 1
@@ -203,7 +254,7 @@ final class ShaderPackageValidationTests: XCTestCase {
         try content.write(to: url, atomically: true, encoding: .utf8)
     }
 
-    private func validManifest(id: String, name: String) -> String {
+    private func validManifest(id: String, name: String, extra: String = "") -> String {
         """
         manifestVersion: 1
         shaderInterfaceVersion: 1
@@ -213,6 +264,7 @@ final class ShaderPackageValidationTests: XCTestCase {
         fragmentFunction: duplicateShader
         source: shader.metal
         resources: []
+        \(extra)
         """
     }
 }

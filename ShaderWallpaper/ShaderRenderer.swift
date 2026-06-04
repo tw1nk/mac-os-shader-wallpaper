@@ -754,8 +754,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     }
     
     @objc func openShaderLibrary() {
+        NSApp.setActivationPolicy(.regular)
+
         if shaderLibraryWindowController == nil {
             shaderLibraryWindowController = ShaderLibraryWindowController(renderer: renderer)
+            shaderLibraryWindowController?.onClose = { [weak self] in
+                self?.shaderLibraryWindowController = nil
+                NSApp.setActivationPolicy(.accessory)
+            }
         }
         shaderLibraryWindowController?.showAndFocus()
     }

@@ -2,6 +2,26 @@ import Foundation
 import Yams
 
 struct ShaderManifest: Decodable, Equatable {
+    private enum CodingKeys: String, CodingKey {
+        case manifestVersion
+        case shaderInterfaceVersion
+        case id
+        case name
+        case version
+        case description
+        case author
+        case homepage
+        case license
+        case fragmentFunction
+        case source
+        case library
+        case resources
+        case assets
+        case preview
+        case menuOrder
+        case editable
+    }
+
     let manifestVersion: Int
     let shaderInterfaceVersion: Int
     let id: String
@@ -18,6 +38,28 @@ struct ShaderManifest: Decodable, Equatable {
     let assets: ShaderManifestAssets?
     let preview: ShaderManifestPreview?
     let menuOrder: Int?
+    let editable: Bool?
+
+    init(from decoder: Decoder) throws {
+        let container = try decoder.container(keyedBy: CodingKeys.self)
+        manifestVersion = try container.decode(Int.self, forKey: .manifestVersion)
+        shaderInterfaceVersion = try container.decode(Int.self, forKey: .shaderInterfaceVersion)
+        id = try container.decode(String.self, forKey: .id)
+        name = try container.decode(String.self, forKey: .name)
+        version = try container.decode(SemanticVersion.self, forKey: .version)
+        description = try container.decodeIfPresent(String.self, forKey: .description)
+        author = try container.decodeIfPresent(String.self, forKey: .author)
+        homepage = try container.decodeIfPresent(URL.self, forKey: .homepage)
+        license = try container.decodeIfPresent(String.self, forKey: .license)
+        fragmentFunction = try container.decode(String.self, forKey: .fragmentFunction)
+        source = try container.decodeIfPresent(String.self, forKey: .source)
+        library = try container.decodeIfPresent(String.self, forKey: .library)
+        resources = try container.decode([String].self, forKey: .resources)
+        assets = try container.decodeIfPresent(ShaderManifestAssets.self, forKey: .assets)
+        preview = try container.decodeIfPresent(ShaderManifestPreview.self, forKey: .preview)
+        menuOrder = try container.decodeIfPresent(Int.self, forKey: .menuOrder)
+        editable = (try? container.decodeIfPresent(Bool.self, forKey: .editable)) ?? nil
+    }
 
     var artifact: ShaderArtifact? {
         if let source, library == nil {
@@ -187,6 +229,7 @@ struct UnknownYAMLFieldReporter {
         "resources",
         "assets",
         "preview",
-        "menuOrder"
+        "menuOrder",
+        "editable"
     ]
 }

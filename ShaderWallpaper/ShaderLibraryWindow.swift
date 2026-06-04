@@ -468,6 +468,8 @@ private struct ShaderLibraryDetailPane: View {
 final class ShaderLibraryWindowController: NSWindowController, NSWindowDelegate {
     private static let frameAutosaveName = "ShaderLibraryWindowFrame"
 
+    var onClose: (() -> Void)?
+
     init(renderer: ShaderRenderer) {
         let state = ShaderLibraryState(renderer: renderer)
         let hostingController = NSHostingController(rootView: ShaderLibraryWindowView(state: state))
@@ -489,5 +491,9 @@ final class ShaderLibraryWindowController: NSWindowController, NSWindowDelegate 
         showWindow(nil)
         window?.makeKeyAndOrderFront(nil)
         NSApp.activate(ignoringOtherApps: true)
+    }
+
+    func windowWillClose(_ notification: Notification) {
+        onClose?()
     }
 }

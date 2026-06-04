@@ -95,6 +95,7 @@ assets:
       path: textures/noise.png
 preview:
   image: preview.png
+editable: true # optional explicit permission for in-app editing of installed source packages
 menuOrder: 10 # bundled packages only; ignored with warning for installed packages
 ```
 
@@ -117,6 +118,7 @@ Optional fields:
 - `license`
 - `assets.textures`
 - `preview.image`
+- `editable`: explicit author permission for in-app editing; boolean only; omitted means editing is not permitted
 - `menuOrder` for bundled packages only
 
 Unknown fields warn but do not invalidate the package.

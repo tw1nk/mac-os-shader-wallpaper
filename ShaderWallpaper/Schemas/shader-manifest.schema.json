@@ -72,6 +72,7 @@
         "image": { "type": "string", "minLength": 1 }
       }
     },
-    "menuOrder": { "type": "integer" }
+    "menuOrder": { "type": "integer" },
+    "editable": { "type": "boolean" }
   }
 }

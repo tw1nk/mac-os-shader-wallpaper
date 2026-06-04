@@ -11,6 +11,12 @@ struct ShaderEffectDescriptor: Equatable {
     var hasWarnings: Bool {
         diagnostics.contains { $0.severity == .warning }
     }
+
+    var isEditable: Bool {
+        guard source == .installed, manifest.editable == true else { return false }
+        if case .source = manifest.artifact { return true }
+        return false
+    }
 }
 
 struct ShaderPackageRegistry: Equatable {

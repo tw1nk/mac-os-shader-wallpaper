@@ -32,6 +32,7 @@ enum ShaderDiagnosticCode: String, Equatable {
     case unusedTextureAsset
     case packageFolderOpenFailed
     case importFailed
+    case invalidEditablePermission
 }
 
 struct ShaderPackageDiagnostic: Equatable {
@@ -141,6 +142,9 @@ struct ShaderPackageValidator {
 
         for field in unknownFields(in: rawMapping, allowed: UnknownYAMLFieldReporter.manifestV1TopLevelKeys) {
             diagnostics.append(diagnostic(.warning, .unknownManifestField, "Unknown manifest field ignored: \(field)."))
+        }
+        if let editableValue = rawMapping["editable"], !(editableValue is Bool) {
+            diagnostics.append(diagnostic(.warning, .invalidEditablePermission, "editable must be a boolean true or false value; editing will not be permitted."))
         }
         diagnostics.append(contentsOf: nestedUnknownFieldDiagnostics(in: rawMapping, displayName: displayName, source: source))
 

@@ -44,6 +44,14 @@ _Avoid_: Metal library, package folder
 The user interface for browsing the Shader Library, previewing shader effects, and choosing the active shader effect.
 _Avoid_: Shader picker, select shader menu
 
+**Shader Editor Window**:
+The user interface for editing one source-backed, installed, folder-based Shader Package whose Shader Manifest explicitly allows editing, and previewing that package while authoring it. It does not edit bundled packages or compiled-library packages.
+_Avoid_: Code editor, shader playground, package editor
+
+**Shader Hot Reload**:
+The authoring behavior where a saved change to an editable Shader Package is validated and re-rendered without reopening the app or reselecting the shader effect.
+_Avoid_: Live reload, auto compile
+
 **Shader Interface**:
 The contract a shader effect follows so the app can render it. It defines the fragment function inputs the app knows how to provide.
 _Avoid_: ABI, function signature, protocol
@@ -80,3 +88,7 @@ Developer: "Where should people browse previews and choose effects?"
 Domain expert: "In the Shader Library Window, which presents the Shader Library."
 Developer: "Who provides preview images for effects?"
 Domain expert: "A Shader Package may provide a package-local preview image, otherwise the app generates one from the shader effect."
+Developer: "Can the Shader Editor Window edit any Shader Package?"
+Domain expert: "No. It edits one source-backed, installed, folder-based Shader Package whose Shader Manifest explicitly allows editing. Bundled packages, compiled-library packages, and packages without explicit editing permission are not editable."
+Developer: "When does Shader Hot Reload happen?"
+Domain expert: "On save. The app validates and re-renders saved package changes without requiring the user to reopen the app or reselect the shader effect."
