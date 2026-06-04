@@ -350,63 +350,16 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
     }
     
     func loadShader(_ shader: ShaderEffectDescriptor, for metalView: MTKView, isInitialLoad: Bool = false, persistSelection: Bool = true) {
-        guard
-            let appLibrary = try? device.makeDefaultLibrary(bundle: Bundle.main),
-            let vertexFunction = appLibrary.makeFunction(name: "vertexShader")
-        else {
-            recordLoadFailure(for: shader, message: "Failed to load app vertex function for shader package: \(shader.name)")
-            if isInitialLoad {
-                loadErrorShader(for: metalView, reason: "Selected shader package '\(shader.id)' could not render.")
-            }
-            return
-        }
-
-        let packageLibrary: MTLLibrary
         do {
-            switch shader.manifest.artifact {
-            case let .library(libraryPath):
-                packageLibrary = try device.makeLibrary(URL: shader.packageURL.appendingPathComponent(libraryPath))
-            case .source:
-                packageLibrary = try ShaderSourceCompiler.makeLibrary(for: shader, device: device)
-            case nil:
-                throw ShaderSourceCompilerError.notSourcePackage
-            }
-        } catch {
-            recordLoadFailure(for: shader, message: "Failed to load shader package '\(shader.name)': \(error.localizedDescription)")
-            if isInitialLoad {
-                loadErrorShader(for: metalView, reason: "Selected shader package '\(shader.id)' could not render.")
-            }
-            return
-        }
+            let result = try ShaderEffectLoader(device: device, pixelFormat: metalView.colorPixelFormat).load(shader)
 
-        guard let fragmentFunction = packageLibrary.makeFunction(name: shader.manifest.fragmentFunction) else {
-            recordLoadFailure(for: shader, message: "Shader package '\(shader.name)' does not contain fragment function '\(shader.manifest.fragmentFunction)'.")
-            if isInitialLoad {
-                loadErrorShader(for: metalView, reason: "Selected shader package '\(shader.id)' could not render.")
-            }
-            return
-        }
-        
-        let pipelineDescriptor = MTLRenderPipelineDescriptor()
-        pipelineDescriptor.vertexFunction = vertexFunction
-        pipelineDescriptor.fragmentFunction = fragmentFunction
-        pipelineDescriptor.colorAttachments[0].pixelFormat = metalView.colorPixelFormat
-        
-        do {
-            var reflection: MTLAutoreleasedRenderPipelineReflection?
-            let newPipelineState = try device.makeRenderPipelineState(
-                descriptor: pipelineDescriptor,
-                options: [.bindingInfo],
-                reflection: &reflection
-            )
-            let bindings = try loadPackageTextures(for: shader, reflection: reflection)
-
-            pipelineState = newPipelineState
+            pipelineState = result.pipelineState
             currentShader = shader
             isShowingErrorShader = false
             prepareResources(for: shader)
-            activeDesktopTextureIndex = bindings.desktopTextureIndex
-            activePackageTextures = bindings.packageTextures
+            activeDesktopTextureIndex = result.desktopTextureIndex
+            activePackageTextures = result.packageTextures
+            packageDiagnostics.append(contentsOf: result.diagnostics)
             if persistSelection {
                 UserDefaults.standard.set(shader.id, forKey: ShaderEffectDescriptor.storageKey)
             }
@@ -419,60 +372,6 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
         }
     }
     
-    private func loadPackageTextures(
-        for shader: ShaderEffectDescriptor,
-        reflection: MTLAutoreleasedRenderPipelineReflection?
-    ) throws -> (desktopTextureIndex: Int, packageTextures: [(index: Int, texture: MTLTexture)]) {
-        let declaredTextures = shader.manifest.assets?.textures ?? []
-        let declaredByName = Dictionary(uniqueKeysWithValues: declaredTextures.map { ($0.name, $0) })
-        let fragmentTextureArguments = (reflection?.fragmentBindings ?? []).filter { $0.type == .texture }
-        let textureArgumentByName = Dictionary(uniqueKeysWithValues: fragmentTextureArguments.map { ($0.name, $0) })
-        let reservedTextureNames: Set<String> = ["desktopTexture"]
-        var loadedTextures: [(index: Int, texture: MTLTexture)] = []
-        var desktopTextureIndex = 0
-
-        for argument in fragmentTextureArguments {
-            if reservedTextureNames.contains(argument.name) {
-                guard shader.manifest.resources.contains(argument.name) else {
-                    throw ShaderPackageLoadError.unsatisfiedTextureArgument(argument.name)
-                }
-                desktopTextureIndex = argument.index
-                continue
-            }
-
-            guard let textureAsset = declaredByName[argument.name] else {
-                throw ShaderPackageLoadError.unsatisfiedTextureArgument(argument.name)
-            }
-
-            let textureURL = shader.packageURL.appendingPathComponent(textureAsset.path)
-            let loader = MTKTextureLoader(device: device)
-            let texture = try loader.newTexture(
-                URL: textureURL,
-                options: [
-                    .SRGB: false,
-                    .textureUsage: MTLTextureUsage.shaderRead.rawValue
-                ]
-            )
-            loadedTextures.append((index: argument.index, texture: texture))
-        }
-
-        for textureAsset in declaredTextures where textureArgumentByName[textureAsset.name] == nil {
-            packageDiagnostics.append(
-                ShaderPackageDiagnostic(
-                    severity: .warning,
-                    code: .unusedTextureAsset,
-                    message: "Texture asset '\(textureAsset.name)' is declared but not used by the fragment function.",
-                    packageID: shader.id,
-                    packageDisplayName: shader.name,
-                    source: shader.source,
-                    packageURL: shader.packageURL
-                )
-            )
-        }
-
-        return (desktopTextureIndex, loadedTextures)
-    }
-
     private func recordLoadFailure(for shader: ShaderEffectDescriptor, message: String) {
         packageDiagnostics.append(
             ShaderPackageDiagnostic(
