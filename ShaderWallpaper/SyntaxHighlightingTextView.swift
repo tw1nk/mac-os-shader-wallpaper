@@ -23,6 +23,10 @@ struct SyntaxHighlightingTextView: NSViewRepresentable {
         textView.isAutomaticQuoteSubstitutionEnabled = false
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.font = .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
+        textView.drawsBackground = true
+        textView.backgroundColor = .textBackgroundColor
+        textView.textColor = .labelColor
+        textView.insertionPointColor = .labelColor
         textView.delegate = context.coordinator
         textView.string = text
         scroll.documentView = textView
@@ -35,6 +39,9 @@ struct SyntaxHighlightingTextView: NSViewRepresentable {
         context.coordinator.parent = self
         guard let textView = scroll.documentView as? NSTextView else { return }
         textView.isEditable = isEditable
+        textView.backgroundColor = .textBackgroundColor
+        textView.textColor = .labelColor
+        textView.insertionPointColor = .labelColor
         if textView.string != text {
             textView.string = text
             context.coordinator.highlightSoon()
@@ -70,7 +77,8 @@ struct SyntaxHighlightingTextView: NSViewRepresentable {
             let full = NSRange(location: 0, length: string.length)
             attributed.addAttributes([
                 .font: NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular),
-                .foregroundColor: NSColor.labelColor
+                .foregroundColor: NSColor.textColor,
+                .backgroundColor: NSColor.textBackgroundColor
             ], range: full)
 
             let rules: [(String, NSColor)]
