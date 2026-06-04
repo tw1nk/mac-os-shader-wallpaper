@@ -145,6 +145,22 @@ struct ShaderLibraryWindowView: View {
                     }
                 }
 
+                if state.renderer.isShowingErrorShader {
+                    ShaderLibraryBanner(
+                        title: "Wallpaper is showing the Error Shader",
+                        message: "The selected shader could not render. Open diagnostics for details."
+                    ) {
+                        state.showDiagnostics()
+                    }
+                } else if state.hasDiagnostics {
+                    ShaderLibraryBanner(
+                        title: "Shader Package Diagnostics Available",
+                        message: "Some packages have warnings or errors."
+                    ) {
+                        state.showDiagnostics()
+                    }
+                }
+
                 Picker("Filter", selection: $state.selectedFilter) {
                     ForEach(ShaderLibraryFilter.allCases) { filter in
                         Text(filter.title).tag(filter)
@@ -295,6 +311,27 @@ private struct ShaderEffectCard: View {
     }
 }
 
+private struct ShaderLibraryBanner: View {
+    let title: String
+    let message: String
+    let action: () -> Void
+
+    var body: some View {
+        HStack(alignment: .top) {
+            Image(systemName: "exclamationmark.triangle.fill")
+                .foregroundStyle(.orange)
+            VStack(alignment: .leading) {
+                Text(title).bold()
+                Text(message).font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Button("Diagnostics", action: action)
+        }
+        .padding(10)
+        .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
+    }
+}
+
 private struct ShaderEffectThumbnailPlaceholder: View {
     let effect: ShaderEffectDescriptor
 
@@ -387,6 +424,20 @@ private struct ShaderLibraryDetailPane: View {
                     .font(.caption)
                     .foregroundStyle(.secondary)
                     .textSelection(.enabled)
+
+                let selectedDiagnostics = state.renderer.packageDiagnostics.filter { $0.packageID == selectedEffect.id }
+                if !selectedDiagnostics.isEmpty {
+                    VStack(alignment: .leading, spacing: 6) {
+                        ForEach(Array(selectedDiagnostics.enumerated()), id: \.offset) { _, diagnostic in
+                            Text("\(diagnostic.severity.rawValue.capitalized): \(diagnostic.message)")
+                                .font(.caption)
+                                .foregroundStyle(diagnostic.severity == .error ? .red : .orange)
+                                .textSelection(.enabled)
+                        }
+                    }
+                    .padding(8)
+                    .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                }
 
                 Button(selectedEffect.id == state.activeShaderID ? "Active" : "Set Active") {
                     state.setActive(selectedEffect)

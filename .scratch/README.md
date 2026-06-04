@@ -9,4 +9,4 @@ Previous shader package issues `SCRATCH-0001` through `SCRATCH-0014` were comple
 - [SCRATCH-0019: Add live detail preview renderer](issues/0019-add-live-detail-preview-renderer.md) — closed
 - [SCRATCH-0020: Set active shader from Shader Library Window](issues/0020-set-active-shader-from-shader-library-window.md) — closed
 - [SCRATCH-0021: Add Shader Library management toolbar actions](issues/0021-add-shader-library-management-toolbar-actions.md) — closed
-- [SCRATCH-0022: Surface diagnostics and Error Shader state in Shader Library](issues/0022-surface-diagnostics-and-error-shader-state-in-shader-library.md) — open
+- [SCRATCH-0022: Surface diagnostics and Error Shader state in Shader Library](issues/0022-surface-diagnostics-and-error-shader-state-in-shader-library.md) — closed

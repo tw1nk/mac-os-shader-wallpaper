@@ -53,7 +53,7 @@ class ShaderRenderer: NSObject, MTKViewDelegate {
     var packageRegistry: ShaderPackageRegistry
     var currentShader: ShaderEffectDescriptor?
     var packageDiagnostics: [ShaderPackageDiagnostic] = []
-    private var isShowingErrorShader = false
+    private(set) var isShowingErrorShader = false
     private weak var metalView: MTKView?
     private var desktopTexture: MTLTexture?
     private var activeDesktopTextureIndex = 0
