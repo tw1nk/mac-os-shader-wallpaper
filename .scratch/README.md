@@ -15,7 +15,7 @@ Previous shader package issues `SCRATCH-0001` through `SCRATCH-0014` were comple
 - [SCRATCH-0025: Create new editable Shader Packages from the status menu](issues/0025-create-new-editable-shader-packages-from-the-status-menu.md) — closed
 - [SCRATCH-0026: Open one Shader Editor Window per package](issues/0026-open-one-shader-editor-window-per-package.md) — closed
 - [SCRATCH-0027: Edit manifest and source buffers with explicit save](issues/0027-edit-manifest-and-source-buffers-with-explicit-save.md) — closed
-- [SCRATCH-0028: Add basic syntax coloring editor](issues/0028-add-basic-syntax-coloring-editor.md) — open
+- [SCRATCH-0028: Add basic syntax coloring editor](issues/0028-add-basic-syntax-coloring-editor.md) — closed
 - [SCRATCH-0029: Introduce shared Shader Effect loading core](issues/0029-introduce-shared-shader-effect-loading-core.md) — closed
 - [SCRATCH-0030: Implement editor preview with save-triggered Shader Hot Reload](issues/0030-implement-editor-preview-with-save-triggered-shader-hot-reload.md) — open
 - [SCRATCH-0031: Safely hot reload active wallpaper after editor preview succeeds](issues/0031-safely-hot-reload-active-wallpaper-after-editor-preview-succeeds.md) — open

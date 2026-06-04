@@ -129,16 +129,20 @@ struct ShaderEditorWindowView: View {
                 VStack(alignment: .leading) {
                     Text("shader.yaml")
                         .font(.headline)
-                    TextEditor(text: Binding(get: { state.manifestText }, set: state.manifestChanged))
-                        .font(.system(.body, design: .monospaced))
-                        .disabled(!state.packageExists)
+                    SyntaxHighlightingTextView(
+                        text: Binding(get: { state.manifestText }, set: state.manifestChanged),
+                        syntax: .yaml,
+                        isEditable: state.packageExists
+                    )
                 }
                 VStack(alignment: .leading) {
                     Text("Source")
                         .font(.headline)
-                    TextEditor(text: Binding(get: { state.sourceText }, set: state.sourceChanged))
-                        .font(.system(.body, design: .monospaced))
-                        .disabled(!state.packageExists)
+                    SyntaxHighlightingTextView(
+                        text: Binding(get: { state.sourceText }, set: state.sourceChanged),
+                        syntax: .metal,
+                        isEditable: state.packageExists
+                    )
                 }
             }
 
