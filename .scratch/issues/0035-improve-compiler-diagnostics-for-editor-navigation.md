@@ -1,6 +1,6 @@
 # SCRATCH-0035: Improve compiler diagnostics for editor navigation
 
-Status: open
+Status: closed
 Type: AFK
 
 ## What to build
@@ -9,11 +9,11 @@ Return and display structured Metal compiler diagnostics so authors can jump fro
 
 ## Acceptance criteria
 
-- [ ] Compiler output is parsed into file, line, column, severity, and message when possible.
-- [ ] Raw compiler output is shown when parsing fails.
-- [ ] Diagnostics display line/column information in the editor panel.
-- [ ] Selecting a matching diagnostic navigates to the source location.
-- [ ] Header prepending/#line behavior preserves package source locations where possible.
+- [x] Compiler output is parsed into file, line, column, severity, and message when possible.
+- [x] Raw compiler output is shown when parsing fails.
+- [x] Diagnostics display line/column information in the editor panel.
+- [x] Selecting a matching diagnostic navigates to the source location.
+- [x] Header prepending/#line behavior preserves package source locations where possible.
 
 ## Blocked by
 

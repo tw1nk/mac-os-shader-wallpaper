@@ -132,7 +132,14 @@ struct ShaderSourceCompiler {
             options.setValue([shader.packageURL.path], forKey: "includeSearchPaths")
         }
 
-        return try device.makeLibrary(source: source, options: options)
+        do {
+            return try device.makeLibrary(source: source, options: options)
+        } catch {
+            throw ShaderSourceCompilerError.compileFailed(
+                message: error.localizedDescription,
+                diagnostics: MetalCompilerDiagnostic.parse(error.localizedDescription)
+            )
+        }
     }
 
     private static func publicHeaderSource() -> String? {
@@ -145,9 +152,38 @@ struct ShaderSourceCompiler {
     }
 }
 
+struct MetalCompilerDiagnostic: Equatable {
+    let file: String?
+    let line: Int?
+    let column: Int?
+    let severity: String
+    let message: String
+
+    static func parse(_ output: String) -> [MetalCompilerDiagnostic] {
+        let pattern = #"(?m)^(.*?):(\d+):(\d+):\s*(error|warning):\s*(.*)$"#
+        guard let regex = try? NSRegularExpression(pattern: pattern) else { return [] }
+        let ns = output as NSString
+        return regex.matches(in: output, range: NSRange(location: 0, length: ns.length)).map { match in
+            func group(_ i: Int) -> String? {
+                let r = match.range(at: i)
+                guard r.location != NSNotFound else { return nil }
+                return ns.substring(with: r)
+            }
+            return MetalCompilerDiagnostic(
+                file: group(1),
+                line: group(2).flatMap(Int.init),
+                column: group(3).flatMap(Int.init),
+                severity: group(4) ?? "error",
+                message: group(5) ?? output
+            )
+        }
+    }
+}
+
 enum ShaderSourceCompilerError: Error, LocalizedError {
     case notSourcePackage
     case includeValidationFailed(String)
+    case compileFailed(message: String, diagnostics: [MetalCompilerDiagnostic])
 
     var errorDescription: String? {
         switch self {
@@ -155,6 +191,12 @@ enum ShaderSourceCompilerError: Error, LocalizedError {
             return "Package does not declare source."
         case let .includeValidationFailed(message):
             return message
+        case let .compileFailed(message, diagnostics):
+            if diagnostics.isEmpty { return message }
+            return diagnostics.map { diagnostic in
+                let location = [diagnostic.file, diagnostic.line.map(String.init), diagnostic.column.map(String.init)].compactMap { $0 }.joined(separator: ":")
+                return "\(location): \(diagnostic.severity): \(diagnostic.message)"
+            }.joined(separator: "\n")
         }
     }
 }
