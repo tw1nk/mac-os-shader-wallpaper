@@ -30,11 +30,13 @@ final class ShaderLibraryState: ObservableObject {
     @Published var searchText = ""
 
     let renderer: ShaderRenderer
+    let onEditShader: ((ShaderEffectDescriptor) -> Void)?
 
     private static let selectedFilterKey = "shaderLibrary.selectedFilter"
 
-    init(renderer: ShaderRenderer) {
+    init(renderer: ShaderRenderer, onEditShader: ((ShaderEffectDescriptor) -> Void)? = nil) {
         self.renderer = renderer
+        self.onEditShader = onEditShader
         if
             let rawValue = UserDefaults.standard.string(forKey: Self.selectedFilterKey),
             let filter = ShaderLibraryFilter(rawValue: rawValue)
@@ -57,6 +59,10 @@ final class ShaderLibraryState: ObservableObject {
     func setActive(_ effect: ShaderEffectDescriptor) {
         renderer.activateShader(effect)
         objectWillChange.send()
+    }
+
+    func edit(_ effect: ShaderEffectDescriptor) {
+        onEditShader?(effect)
     }
 
     func reloadPackages() {
@@ -439,10 +445,18 @@ private struct ShaderLibraryDetailPane: View {
                     .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
                 }
 
-                Button(selectedEffect.id == state.activeShaderID ? "Active" : "Set Active") {
-                    state.setActive(selectedEffect)
+                HStack {
+                    Button(selectedEffect.id == state.activeShaderID ? "Active" : "Set Active") {
+                        state.setActive(selectedEffect)
+                    }
+                    .disabled(selectedEffect.id == state.activeShaderID)
+
+                    if selectedEffect.isEditable {
+                        Button("Edit") {
+                            state.edit(selectedEffect)
+                        }
+                    }
                 }
-                .disabled(selectedEffect.id == state.activeShaderID)
             } else {
                 Text("Select a Shader Effect")
                     .font(.headline)
@@ -470,8 +484,8 @@ final class ShaderLibraryWindowController: NSWindowController, NSWindowDelegate 
 
     var onClose: (() -> Void)?
 
-    init(renderer: ShaderRenderer) {
-        let state = ShaderLibraryState(renderer: renderer)
+    init(renderer: ShaderRenderer, onEditShader: ((ShaderEffectDescriptor) -> Void)? = nil) {
+        let state = ShaderLibraryState(renderer: renderer, onEditShader: onEditShader)
         let hostingController = NSHostingController(rootView: ShaderLibraryWindowView(state: state))
         let window = NSWindow(contentViewController: hostingController)
         window.title = "Shader Library"
