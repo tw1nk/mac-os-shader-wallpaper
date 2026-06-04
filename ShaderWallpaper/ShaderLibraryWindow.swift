@@ -180,14 +180,7 @@ private struct ShaderEffectCard: View {
         Button(action: onSelect) {
             VStack(alignment: .leading, spacing: 8) {
                 ZStack(alignment: .topTrailing) {
-                    RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.black.opacity(0.86))
-                        .aspectRatio(16.0 / 9.0, contentMode: .fit)
-                        .overlay {
-                            Image(systemName: "sparkles")
-                                .font(.title2)
-                                .foregroundStyle(.secondary)
-                        }
+                    ShaderEffectThumbnailPlaceholder(effect: effect)
 
                     HStack(spacing: 4) {
                         if effect.hasWarnings {
@@ -218,6 +211,40 @@ private struct ShaderEffectCard: View {
             )
         }
         .buttonStyle(.plain)
+    }
+}
+
+private struct ShaderEffectThumbnailPlaceholder: View {
+    let effect: ShaderEffectDescriptor
+
+    var body: some View {
+        Group {
+            if let image = previewImage {
+                Image(nsImage: image)
+                    .resizable()
+                    .scaledToFill()
+            } else {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(Color.black.opacity(0.86))
+                    .overlay {
+                        Image(systemName: "sparkles")
+                            .font(.title2)
+                            .foregroundStyle(.secondary)
+                    }
+            }
+        }
+        .aspectRatio(16.0 / 9.0, contentMode: .fit)
+        .clipShape(RoundedRectangle(cornerRadius: 10))
+        .overlay {
+            RoundedRectangle(cornerRadius: 10)
+                .stroke(Color.secondary.opacity(0.15), lineWidth: 1)
+        }
+    }
+
+    private var previewImage: NSImage? {
+        guard let imagePath = effect.manifest.preview?.image else { return nil }
+        let imageURL = effect.packageURL.appendingPathComponent(imagePath)
+        return NSImage(contentsOf: imageURL)
     }
 }
 

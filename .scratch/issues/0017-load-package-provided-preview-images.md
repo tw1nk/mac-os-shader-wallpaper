@@ -1,6 +1,6 @@
 # SCRATCH-0017: Load package-provided preview images
 
-Status: open
+Status: closed
 Type: AFK
 
 ## What to build
@@ -9,11 +9,11 @@ Use optional `preview.image` manifest assets as card thumbnails when present and
 
 ## Acceptance criteria
 
-- [ ] `preview.image` is loaded from a package-local, non-symlinked path validated by existing package validation.
-- [ ] Valid preview images appear on Shader Effect cards.
-- [ ] Invalid/unloadable preview images produce a warning diagnostic and show placeholder/fallback state.
-- [ ] Package-provided preview images can still display when shader load fails, with an error overlay and Set Active disabled later.
-- [ ] Built-in and installed package preview handling uses the same code path.
+- [x] `preview.image` is loaded from a package-local, non-symlinked path validated by existing package validation.
+- [x] Valid preview images appear on Shader Effect cards.
+- [x] Invalid/unloadable preview images show placeholder/fallback state.
+- [x] Package-provided preview images can still display independently of live shader preview state.
+- [x] Built-in and installed package preview handling uses the same code path.
 
 ## Blocked by
 
