@@ -84,6 +84,7 @@ final class ShaderEditorState: ObservableObject {
             }
             isDirty = false
             reloadPreview()
+            activeRenderer?.reloadShaderPackages()
             if let previewEffect, previewEffect.id == activeIDBeforeSave {
                 activeRenderer?.activateShader(previewEffect)
             }
