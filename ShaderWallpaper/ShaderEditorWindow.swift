@@ -13,6 +13,7 @@ final class ShaderEditorState: ObservableObject {
     @Published var packageExists = true
 
     private let originalID: String
+    private var watcher: PackageFolderWatcher?
     private var manifestURL: URL?
     private var sourceURL: URL?
     private var savedManifestText = ""
@@ -25,6 +26,17 @@ final class ShaderEditorState: ObservableObject {
         originalID = effect.id
         loadFromDisk()
         reloadPreview()
+        watcher = PackageFolderWatcher(url: packageURL) { [weak self] in self?.externalChangeDetected() }
+        watcher?.start()
+    }
+
+    func externalChangeDetected() {
+        if isDirty {
+            diagnostics.append("External package change detected. Reload from disk or keep your unsaved changes.")
+        } else {
+            loadFromDisk()
+            reloadPreview()
+        }
     }
 
     func loadFromDisk() {

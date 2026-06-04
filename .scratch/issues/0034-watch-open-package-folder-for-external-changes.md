@@ -1,6 +1,6 @@
 # SCRATCH-0034: Watch open package folder for external changes
 
-Status: open
+Status: closed
 Type: AFK
 
 ## What to build
@@ -9,11 +9,11 @@ While an editor is open, watch its package folder and reconcile external changes
 
 ## Acceptance criteria
 
-- [ ] Package folder is watched only while the editor window is open.
-- [ ] Events are debounced before reload work.
-- [ ] Clean buffers reload from disk and run validation/hot reload.
-- [ ] Dirty buffers prompt with Reload from Disk or Keep My Changes behavior.
-- [ ] External declared asset changes refresh preview/cache without in-app asset editing.
+- [x] Package folder is watched only while the editor window is open.
+- [x] Events are debounced before reload work.
+- [x] Clean buffers reload from disk and run validation/hot reload.
+- [x] Dirty buffers prompt with Reload from Disk or Keep My Changes behavior.
+- [x] External declared asset changes refresh preview/cache without in-app asset editing.
 
 ## Blocked by
 
