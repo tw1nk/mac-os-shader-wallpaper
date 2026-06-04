@@ -516,6 +516,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var statusItem: NSStatusItem?
     var diagnosticsWindow: NSWindow?
     var shaderLibraryWindowController: ShaderLibraryWindowController?
+    var shaderEditorWindowControllers: [URL: ShaderEditorWindowController] = [:]
     var isVisible = true
     
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -656,13 +657,34 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         NSApp.setActivationPolicy(.regular)
 
         if shaderLibraryWindowController == nil {
-            shaderLibraryWindowController = ShaderLibraryWindowController(renderer: renderer)
+            shaderLibraryWindowController = ShaderLibraryWindowController(renderer: renderer) { [weak self] effect in
+                self?.openShaderEditor(for: effect)
+            }
             shaderLibraryWindowController?.onClose = { [weak self] in
                 self?.shaderLibraryWindowController = nil
                 NSApp.setActivationPolicy(.accessory)
             }
         }
         shaderLibraryWindowController?.showAndFocus()
+    }
+
+    private func openShaderEditor(for effect: ShaderEffectDescriptor) {
+        NSApp.setActivationPolicy(.regular)
+        let packageURL = effect.packageURL.standardizedFileURL
+        if let controller = shaderEditorWindowControllers[packageURL] {
+            controller.showAndFocus()
+            return
+        }
+
+        let controller = ShaderEditorWindowController(effect: effect)
+        controller.onClose = { [weak self] url in
+            self?.shaderEditorWindowControllers[url.standardizedFileURL] = nil
+            if self?.shaderLibraryWindowController == nil && self?.shaderEditorWindowControllers.isEmpty == true {
+                NSApp.setActivationPolicy(.accessory)
+            }
+        }
+        shaderEditorWindowControllers[packageURL] = controller
+        controller.showAndFocus()
     }
 
     private var hasDiagnostics: Bool {
