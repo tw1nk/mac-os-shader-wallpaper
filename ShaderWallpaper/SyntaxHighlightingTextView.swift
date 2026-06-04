@@ -11,12 +11,22 @@ struct SyntaxHighlightingTextView: NSViewRepresentable {
     let syntax: ShaderEditorSyntax
     let isEditable: Bool
 
+    private static let editorBackgroundColor = NSColor(calibratedWhite: 0.08, alpha: 1)
+    private static let editorTextColor = NSColor(calibratedWhite: 0.92, alpha: 1)
+    private static let baseTypingAttributes: [NSAttributedString.Key: Any] = [
+        .font: NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular),
+        .foregroundColor: editorTextColor,
+        .backgroundColor: editorBackgroundColor
+    ]
+
     func makeCoordinator() -> Coordinator { Coordinator(self) }
 
     func makeNSView(context: Context) -> NSScrollView {
         let scroll = NSScrollView()
         scroll.hasVerticalScroller = true
         scroll.hasHorizontalScroller = true
+        scroll.drawsBackground = true
+        scroll.backgroundColor = Self.editorBackgroundColor
         let textView = NSTextView()
         textView.isRichText = false
         textView.isEditable = isEditable
@@ -24,9 +34,10 @@ struct SyntaxHighlightingTextView: NSViewRepresentable {
         textView.isAutomaticDashSubstitutionEnabled = false
         textView.font = .monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular)
         textView.drawsBackground = true
-        textView.backgroundColor = .textBackgroundColor
-        textView.textColor = .labelColor
-        textView.insertionPointColor = .labelColor
+        textView.backgroundColor = Self.editorBackgroundColor
+        textView.textColor = Self.editorTextColor
+        textView.insertionPointColor = Self.editorTextColor
+        textView.typingAttributes = Self.baseTypingAttributes
         textView.delegate = context.coordinator
         textView.string = text
         scroll.documentView = textView
@@ -39,9 +50,11 @@ struct SyntaxHighlightingTextView: NSViewRepresentable {
         context.coordinator.parent = self
         guard let textView = scroll.documentView as? NSTextView else { return }
         textView.isEditable = isEditable
-        textView.backgroundColor = .textBackgroundColor
-        textView.textColor = .labelColor
-        textView.insertionPointColor = .labelColor
+        scroll.backgroundColor = Self.editorBackgroundColor
+        textView.backgroundColor = Self.editorBackgroundColor
+        textView.textColor = Self.editorTextColor
+        textView.insertionPointColor = Self.editorTextColor
+        textView.typingAttributes = Self.baseTypingAttributes
         if textView.string != text {
             textView.string = text
             context.coordinator.highlightSoon()
@@ -75,29 +88,25 @@ struct SyntaxHighlightingTextView: NSViewRepresentable {
             let selected = textView.selectedRanges
             let attributed = NSMutableAttributedString(string: textView.string)
             let full = NSRange(location: 0, length: string.length)
-            attributed.addAttributes([
-                .font: NSFont.monospacedSystemFont(ofSize: NSFont.systemFontSize, weight: .regular),
-                .foregroundColor: NSColor.textColor,
-                .backgroundColor: NSColor.textBackgroundColor
-            ], range: full)
+            attributed.addAttributes(SyntaxHighlightingTextView.baseTypingAttributes, range: full)
 
             let rules: [(String, NSColor)]
             switch parent.syntax {
             case .metal:
                 rules = [
-                    (#"//.*|/\*[\s\S]*?\*/"#, .systemGray),
-                    (#""([^"\\]|\\.)*""#, .systemRed),
-                    (#"\b(fragment|vertex|constant|using|namespace|return|float|float2|float3|float4|int|uint|half|metal|texture2d|sampler|mix|sin|cos)\b"#, .systemBlue),
-                    (#"\[\[[^\]]+\]\]"#, .systemPurple),
-                    (#"\b\d+(?:\.\d+)?\b"#, .systemOrange)
+                    (#"//.*|/\*[\s\S]*?\*/"#, NSColor(calibratedRed: 0.50, green: 0.65, blue: 0.50, alpha: 1)),
+                    (#""([^"\\]|\\.)*""#, NSColor(calibratedRed: 0.95, green: 0.60, blue: 0.55, alpha: 1)),
+                    (#"\b(fragment|vertex|constant|using|namespace|return|float|float2|float3|float4|int|uint|half|metal|texture2d|sampler|mix|sin|cos)\b"#, NSColor(calibratedRed: 0.45, green: 0.70, blue: 1.00, alpha: 1)),
+                    (#"\[\[[^\]]+\]\]"#, NSColor(calibratedRed: 0.80, green: 0.60, blue: 1.00, alpha: 1)),
+                    (#"\b\d+(?:\.\d+)?\b"#, NSColor(calibratedRed: 1.00, green: 0.75, blue: 0.35, alpha: 1))
                 ]
             case .yaml:
                 rules = [
-                    (#"#.*"#, .systemGray),
-                    (#"(?m)^\s*[A-Za-z_][A-Za-z0-9_.-]*(?=:)"#, .systemBlue),
-                    (#""([^"\\]|\\.)*"|'[^']*'"#, .systemRed),
-                    (#"\b(true|false)\b"#, .systemPurple),
-                    (#"\b\d+(?:\.\d+){0,2}\b"#, .systemOrange)
+                    (#"#.*"#, NSColor(calibratedRed: 0.50, green: 0.65, blue: 0.50, alpha: 1)),
+                    (#"(?m)^\s*[A-Za-z_][A-Za-z0-9_.-]*(?=:)"#, NSColor(calibratedRed: 0.45, green: 0.70, blue: 1.00, alpha: 1)),
+                    (#""([^"\\]|\\.)*"|'[^']*'"#, NSColor(calibratedRed: 0.95, green: 0.60, blue: 0.55, alpha: 1)),
+                    (#"\b(true|false)\b"#, NSColor(calibratedRed: 0.80, green: 0.60, blue: 1.00, alpha: 1)),
+                    (#"\b\d+(?:\.\d+){0,2}\b"#, NSColor(calibratedRed: 1.00, green: 0.75, blue: 0.35, alpha: 1))
                 ]
             }
             for (pattern, color) in rules {
@@ -109,6 +118,7 @@ struct SyntaxHighlightingTextView: NSViewRepresentable {
             }
             isHighlighting = true
             textView.textStorage?.setAttributedString(attributed)
+            textView.typingAttributes = SyntaxHighlightingTextView.baseTypingAttributes
             textView.selectedRanges = selected
             isHighlighting = false
         }
