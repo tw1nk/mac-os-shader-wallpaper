@@ -25,7 +25,7 @@ A packaged archive form of a shader package intended for import or Finder open-w
 _Avoid_: Zip file, shaderpackage
 
 **Package Asset**:
-A non-symlinked file contained inside a shader package that the package's shader effect can use, such as an image texture. Package assets are package-local; they do not grant access to arbitrary files outside the package.
+A non-symlinked file contained inside a shader package that the package's shader effect can use, such as an image texture or preview image. Package assets are package-local; they do not grant access to arbitrary files outside the package.
 _Avoid_: External asset, arbitrary file
 
 **Package Diagnostic**:
@@ -35,6 +35,14 @@ _Avoid_: Log line, failure, package error
 **Error Shader**:
 An internal fallback rendering state used when the app cannot render a selected shader effect. It is not a shader package, is not selectable, and is not remembered as the user's selected effect.
 _Avoid_: Bundled shader, fallback package
+
+**Shader Library**:
+The user-facing collection of available shader effects. It includes built-in and installed effects that the app has discovered.
+_Avoid_: Metal library, package folder
+
+**Shader Library Window**:
+The user interface for browsing the Shader Library, previewing shader effects, and choosing the active shader effect.
+_Avoid_: Shader picker, select shader menu
 
 **Shader Interface**:
 The contract a shader effect follows so the app can render it. It defines the fragment function inputs the app knows how to provide.
@@ -68,3 +76,7 @@ Developer: "Where should package warnings and errors live?"
 Domain expert: "They are Package Diagnostics. The app should surface them in a dedicated screen when there is something to report."
 Developer: "Is the error fallback one of the selectable effects?"
 Domain expert: "No. The Error Shader is internal and only appears when the app cannot render a selected Shader Effect."
+Developer: "Where should people browse previews and choose effects?"
+Domain expert: "In the Shader Library Window, which presents the Shader Library."
+Developer: "Who provides preview images for effects?"
+Domain expert: "A Shader Package may provide a package-local preview image, otherwise the app generates one from the shader effect."

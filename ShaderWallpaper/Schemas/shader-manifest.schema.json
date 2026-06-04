@@ -65,6 +65,13 @@
         }
       }
     },
+    "preview": {
+      "type": "object",
+      "additionalProperties": true,
+      "properties": {
+        "image": { "type": "string", "minLength": 1 }
+      }
+    },
     "menuOrder": { "type": "integer" }
   }
 }

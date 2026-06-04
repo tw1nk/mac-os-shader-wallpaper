@@ -16,6 +16,7 @@ struct ShaderManifest: Decodable, Equatable {
     let library: String?
     let resources: [String]
     let assets: ShaderManifestAssets?
+    let preview: ShaderManifestPreview?
     let menuOrder: Int?
 
     var artifact: ShaderArtifact? {
@@ -37,6 +38,10 @@ struct ShaderManifest: Decodable, Equatable {
 
 struct ShaderManifestAssets: Decodable, Equatable {
     let textures: [ShaderTextureAsset]?
+}
+
+struct ShaderManifestPreview: Decodable, Equatable {
+    let image: String?
 }
 
 struct ShaderTextureAsset: Decodable, Equatable {
@@ -181,6 +186,7 @@ struct UnknownYAMLFieldReporter {
         "library",
         "resources",
         "assets",
+        "preview",
         "menuOrder"
     ]
 }

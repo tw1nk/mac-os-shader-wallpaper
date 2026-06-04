@@ -203,6 +203,10 @@ struct ShaderPackageValidator {
             diagnostics.append(contentsOf: validateManifestPath(texture.path, field: "assets.textures.\(texture.name).path", packageURL: packageURL, manifest: manifest, displayName: displayName, source: source))
         }
 
+        if let previewImagePath = manifest.preview?.image {
+            diagnostics.append(contentsOf: validateManifestPath(previewImagePath, field: "preview.image", packageURL: packageURL, manifest: manifest, displayName: displayName, source: source))
+        }
+
         for resource in manifest.resources where !knownResources.contains(resource) {
             diagnostics.append(manifestDiagnostic(.warning, .unknownResource, "Unknown resource '\(resource)' will be ignored."))
         }
@@ -313,6 +317,12 @@ struct ShaderPackageValidator {
                     packageURL: nil
                 )
             )
+        }
+
+        if let preview = mapping["preview"] as? [String: Any] {
+            for key in preview.keys where key != "image" {
+                warning("preview.\(key)")
+            }
         }
 
         if let assets = mapping["assets"] as? [String: Any] {

@@ -585,6 +585,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var renderer: ShaderRenderer!
     var statusItem: NSStatusItem?
     var diagnosticsWindow: NSWindow?
+    var shaderLibraryWindowController: ShaderLibraryWindowController?
     var isVisible = true
     
     func applicationDidFinishLaunching(_ notification: Notification) {
@@ -650,6 +651,14 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         menu.addItem(visibilityItem)
         
         menu.addItem(NSMenuItem.separator())
+
+        let shaderLibraryItem = NSMenuItem(
+            title: "Open Shader Library…",
+            action: #selector(openShaderLibrary),
+            keyEquivalent: ""
+        )
+        shaderLibraryItem.target = self
+        menu.addItem(shaderLibraryItem)
         
         let shaderMenuItem = NSMenuItem(title: "Select Shader", action: nil, keyEquivalent: "")
         shaderMenuItem.submenu = makeShaderMenu()
@@ -713,6 +722,13 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         statusItem?.menu = menu
     }
     
+    @objc func openShaderLibrary() {
+        if shaderLibraryWindowController == nil {
+            shaderLibraryWindowController = ShaderLibraryWindowController(renderer: renderer)
+        }
+        shaderLibraryWindowController?.showAndFocus()
+    }
+
     private var hasDiagnostics: Bool {
         renderer.packageDiagnostics.contains { $0.severity == .warning || $0.severity == .error }
     }
