@@ -3,6 +3,7 @@ import SwiftUI
 
 struct ShaderLivePreviewView: NSViewRepresentable {
     let effect: ShaderEffectDescriptor?
+    var reloadToken: Int = 0
 
     func makeCoordinator() -> Coordinator {
         Coordinator()
@@ -28,8 +29,9 @@ struct ShaderLivePreviewView: NSViewRepresentable {
 
     func updateNSView(_ view: MTKView, context: Context) {
         guard let renderer = context.coordinator.renderer else { return }
-        if context.coordinator.effectID != effect?.id {
-            context.coordinator.effectID = effect?.id
+        let key = ReloadKey(effectID: effect?.id, reloadToken: reloadToken)
+        if context.coordinator.reloadKey != key {
+            context.coordinator.reloadKey = key
             if let effect {
                 renderer.loadShader(effect, for: view, persistSelection: false)
                 view.isPaused = false
@@ -39,8 +41,13 @@ struct ShaderLivePreviewView: NSViewRepresentable {
         }
     }
 
+    struct ReloadKey: Equatable {
+        let effectID: String?
+        let reloadToken: Int
+    }
+
     final class Coordinator {
         var renderer: ShaderRenderer?
-        var effectID: String?
+        var reloadKey: ReloadKey?
     }
 }

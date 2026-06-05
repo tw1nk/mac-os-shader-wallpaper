@@ -9,6 +9,7 @@ final class ShaderEditorState: ObservableObject {
     @Published var sourceText = ""
     @Published var diagnostics: [String] = []
     @Published var previewEffect: ShaderEffectDescriptor?
+    @Published var previewReloadToken = 0
     @Published var isDirty = false
     @Published var packageExists = true
 
@@ -121,6 +122,7 @@ final class ShaderEditorState: ObservableObject {
             diagnostics: candidate.diagnostics
         )
         previewEffect = effect
+        previewReloadToken += 1
         effectName = manifest.name
         if manifest.id != originalID {
             diagnostics.append("Package id changed; use Set Active again to activate the new Shader Effect identity.")
@@ -245,7 +247,7 @@ struct ShaderEditorWindowView: View {
             VStack(alignment: .leading) {
                 Text("Preview")
                     .font(.headline)
-                ShaderLivePreviewView(effect: state.previewEffect)
+                ShaderLivePreviewView(effect: state.previewEffect, reloadToken: state.previewReloadToken)
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .frame(minHeight: 180)
             }
