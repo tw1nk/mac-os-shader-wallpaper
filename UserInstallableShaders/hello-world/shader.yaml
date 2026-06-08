@@ -1,0 +1,12 @@
+manifestVersion: 1
+shaderInterfaceVersion: 1
+id: com.example.wallshader.hello-world
+name: Hello World
+version: 1.0.0
+description: A playful neon "hello" made from twinkling bubbles, rainbow waves, and mouse-reactive ripples.
+author: Shader Wallpaper Example
+license: MIT
+fragmentFunction: helloWorldShader
+source: shaders/hello-world.metal
+resources:
+  - mouse

@@ -196,6 +196,13 @@ private enum ShaderEditorSaveError: LocalizedError {
 
 struct ShaderEditorWindowView: View {
     @ObservedObject var state: ShaderEditorState
+    @State private var selectedEditorTab: EditorTab = .source
+    @State private var sourceFindRequest = 0
+
+    private enum EditorTab: Hashable {
+        case source
+        case manifest
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 10) {
@@ -224,48 +231,65 @@ struct ShaderEditorWindowView: View {
             }
 
             HSplitView {
-                VStack(alignment: .leading) {
-                    Text("shader.yaml")
-                        .font(.headline)
-                    SyntaxHighlightingTextView(
-                        text: Binding(get: { state.manifestText }, set: state.manifestChanged),
-                        syntax: .yaml,
-                        isEditable: state.packageExists
-                    )
-                }
-                VStack(alignment: .leading) {
-                    Text("Source")
-                        .font(.headline)
-                    SyntaxHighlightingTextView(
-                        text: Binding(get: { state.sourceText }, set: state.sourceChanged),
-                        syntax: .metal,
-                        isEditable: state.packageExists
-                    )
-                }
-            }
+                VStack(alignment: .leading, spacing: 8) {
+                    TabView(selection: $selectedEditorTab) {
+                        VStack(alignment: .leading, spacing: 6) {
+                            HStack {
+                                Text("Source")
+                                    .font(.headline)
+                                Spacer()
+                                Button("Find") { sourceFindRequest += 1 }
+                                    .keyboardShortcut("f", modifiers: .command)
+                            }
+                            SourceCodeEditorView(
+                                text: Binding(get: { state.sourceText }, set: state.sourceChanged),
+                                isEditable: state.packageExists,
+                                findRequest: sourceFindRequest
+                            )
+                            .clipShape(RoundedRectangle(cornerRadius: 6))
+                        }
+                        .tabItem { Text("Source") }
+                        .tag(EditorTab.source)
 
-            VStack(alignment: .leading) {
-                Text("Preview")
-                    .font(.headline)
-                ShaderLivePreviewView(effect: state.previewEffect, reloadToken: state.previewReloadToken)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .frame(minHeight: 180)
-            }
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("shader.yaml")
+                                .font(.headline)
+                            SyntaxHighlightingTextView(
+                                text: Binding(get: { state.manifestText }, set: state.manifestChanged),
+                                syntax: .yaml,
+                                isEditable: state.packageExists
+                            )
+                        }
+                        .tabItem { Text("Manifest") }
+                        .tag(EditorTab.manifest)
+                    }
 
-            if !state.diagnostics.isEmpty {
-                VStack(alignment: .leading, spacing: 4) {
-                    ForEach(Array(state.diagnostics.enumerated()), id: \.offset) { _, diagnostic in
-                        Text(diagnostic)
-                            .font(.caption)
-                            .textSelection(.enabled)
+                    if !state.diagnostics.isEmpty {
+                        VStack(alignment: .leading, spacing: 4) {
+                            ForEach(Array(state.diagnostics.enumerated()), id: \.offset) { _, diagnostic in
+                                Text(diagnostic)
+                                    .font(.caption)
+                                    .textSelection(.enabled)
+                            }
+                        }
+                        .padding(8)
+                        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
                     }
                 }
-                .padding(8)
-                .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 8))
+                .frame(minWidth: 520)
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Preview")
+                        .font(.headline)
+                    ShaderLivePreviewView(effect: state.previewEffect, reloadToken: state.previewReloadToken)
+                        .clipShape(RoundedRectangle(cornerRadius: 10))
+                        .frame(minWidth: 280, minHeight: 360)
+                }
+                .frame(minWidth: 320)
             }
         }
         .padding()
-        .frame(minWidth: 900, minHeight: 620)
+        .frame(minWidth: 1000, minHeight: 620)
     }
 }
 
